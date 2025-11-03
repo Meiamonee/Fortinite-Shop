@@ -1,0 +1,30 @@
+import mongoose from "mongoose";
+
+const historySchema = new mongoose.Schema({
+  usuario: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Usuario",
+    required: true
+  },
+  cosmetico: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Cosmeticos",
+    required: true
+  },
+  type: {
+    type: String,
+    enum: ["purchase", "refund"],
+    required: true
+  },
+  valor: {
+    type: Number,
+    required: true
+  },
+  data: {
+    type: Date,
+    default: Date.now
+  }
+});
+
+const Historico = mongoose.model("Historico", historySchema);
+export default Historico;
