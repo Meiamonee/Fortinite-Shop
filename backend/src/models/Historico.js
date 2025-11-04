@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const historySchema = new mongoose.Schema({
+const historicoSchema = new mongoose.Schema({
   usuario: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Usuario",
@@ -8,12 +8,12 @@ const historySchema = new mongoose.Schema({
   },
   cosmetico: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Cosmeticos",
+    ref: "Cosmetico",
     required: true
   },
-  type: {
+  tipo: {
     type: String,
-    enum: ["purchase", "refund"],
+    enum: ["compra", "reembolso"],
     required: true
   },
   valor: {
@@ -26,5 +26,5 @@ const historySchema = new mongoose.Schema({
   }
 });
 
-const Historico = mongoose.model("Historico", historySchema);
+const Historico = mongoose.model("Historico", historicoSchema);
 export default Historico;

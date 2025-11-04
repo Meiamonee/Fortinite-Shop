@@ -4,6 +4,7 @@ import cors from "cors";
 import connectDB from "./config/db.js";
 import AuthRotas from "./rotas/authRotas.js";
 import CosmeticoRotas from "./rotas/CosmeticoRotas.js";
+import CompraRotas from "./rotas/CompraRotas.js";
 
 dotenv.config();
 const app = express();
@@ -18,6 +19,7 @@ connectDB();
 // Rotas principais
 app.use("/auth", AuthRotas);
 app.use("/cosmeticos", CosmeticoRotas);
+app.use("/compras", CompraRotas);
 
 // Rota raiz
 app.get("/", (req, res) => {
