@@ -14,44 +14,47 @@ export const comprarCosmetico = async (req, res) => {
       return res.status(404).json({ mensagem: "Usuário ou cosmético não encontrado." });
     }
 
-    // Verifica se o usuário já comprou este item
-    const jaComprado = usuario.cosmeticosComprados.includes(cosmeticoId);
+    // Verifica se já possui o item
+    const jaComprado = usuario.cosmeticosComprados.some(
+      (id) => id.toString() === cosmetico._id.toString()
+    );
     if (jaComprado) {
       return res.status(400).json({ mensagem: "Este cosmético já foi comprado." });
     }
 
-    // Verifica créditos suficientes
+    // Verifica saldo
     if (usuario.creditos < cosmetico.preco) {
       return res.status(400).json({ mensagem: "Créditos insuficientes." });
     }
 
-    // Atualiza créditos e adiciona o item comprado
-    const usuarioAtualizado = await Usuario.findByIdAndUpdate(
-      usuarioId,
-      {
-        $inc: { creditos: -cosmetico.preco },
-        $push: { cosmeticosComprados: cosmetico._id }
-      },
-      { new: true } // retorna o documento atualizado
-    );
+    // Atualiza e salva no banco corretamente
+    usuario.creditos = usuario.creditos - cosmetico.preco;
+    usuario.cosmeticosComprados.push(cosmetico._id);
 
-    // Cria histórico da compra
+    // 🔹 Salva e garante retorno do novo estado
+    const usuarioAtualizado = await usuario.save({ validateBeforeSave: true });
+
+    // Cria histórico
     await Historico.create({
       usuario: usuario._id,
       cosmetico: cosmetico._id,
       tipo: "compra",
-      valor: cosmetico.preco
+      valor: cosmetico.preco,
+      data: new Date()
     });
 
     res.status(200).json({
       mensagem: "Compra realizada com sucesso!",
-      creditosRestantes: usuarioAtualizado.creditos
+      creditosRestantes: usuarioAtualizado.creditos,
+      cosmeticosComprados: usuarioAtualizado.cosmeticosComprados
     });
+
   } catch (erro) {
-    console.error("Erro ao comprar cosmético:", erro.message);
+    console.error("❌ Erro ao comprar cosmético:", erro);
     res.status(500).json({ mensagem: "Erro ao processar compra." });
   }
 };
+
 
 // 🔹 Listar histórico de um usuário (com formato legível)
 export const listarHistorico = async (req, res) => {
@@ -62,7 +65,6 @@ export const listarHistorico = async (req, res) => {
       .populate("cosmetico", "nome preco imagem")
       .sort({ data: -1 });
 
-    // 🔹 Formata cada registro antes de enviar
     const historicoFormatado = historico.map((item) => {
       const data = new Date(item.data);
       const dataFormatada = data.toLocaleDateString("pt-BR", {
@@ -90,8 +92,53 @@ export const listarHistorico = async (req, res) => {
 
     res.status(200).json(historicoFormatado);
   } catch (erro) {
-    console.error("Erro ao listar histórico:", erro.message);
+    console.error("❌ Erro ao listar histórico:", erro.message);
     res.status(500).json({ mensagem: "Erro ao listar histórico." });
   }
 };
 
+// 🔹 Reembolsar um cosmético
+export const reembolsarCosmetico = async (req, res) => {
+  try {
+    const { usuarioId, cosmeticoId } = req.body;
+
+    const usuario = await Usuario.findById(usuarioId);
+    const cosmetico = await Cosmetico.findById(cosmeticoId);
+
+    if (!usuario || !cosmetico) {
+      return res.status(404).json({ mensagem: "Usuário ou cosmético não encontrado." });
+    }
+
+    // Verifica se o usuário possui o item
+    const possui = usuario.cosmeticosComprados.some(
+      (id) => id.toString() === cosmetico._id.toString()
+    );
+    if (!possui) {
+      return res.status(400).json({ mensagem: "Usuário não possui este cosmético." });
+    }
+
+    // Remove o item e devolve o valor dos créditos
+    usuario.cosmeticosComprados = usuario.cosmeticosComprados.filter(
+      (id) => id.toString() !== cosmetico._id.toString()
+    );
+    usuario.creditos += cosmetico.preco;
+    usuario.markModified("cosmeticosComprados");
+    await usuario.save();
+
+    // Cria registro de reembolso no histórico
+    await Historico.create({
+      usuario: usuario._id,
+      cosmetico: cosmetico._id,
+      tipo: "reembolso",
+      valor: cosmetico.preco,
+    });
+
+    res.status(200).json({
+      mensagem: "Reembolso realizado com sucesso!",
+      creditosRestantes: usuario.creditos,
+    });
+  } catch (erro) {
+    console.error("❌ Erro ao reembolsar cosmético:", erro.message);
+    res.status(500).json({ mensagem: "Erro ao processar reembolso." });
+  }
+};
