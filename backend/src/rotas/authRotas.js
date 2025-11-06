@@ -3,7 +3,7 @@ import { cadastrarUsuario, loginUsuario } from "../controladores/AuthControlador
 
 const router = express.Router();
 
-router.post("/cadastrar", cadastrarUsuario);
+router.post("/registrar", cadastrarUsuario);
 router.post("/login", loginUsuario);
 
 export default router;

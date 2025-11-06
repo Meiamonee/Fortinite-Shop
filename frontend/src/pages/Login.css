@@ -1,0 +1,112 @@
+/* === CONTAINER PAI (centraliza tudo na tela com Flexbox) === */
+body,
+html {
+  height: 100%;
+}
+
+.container.login-active {
+  display: flex;
+  justify-content: center;
+  /* Centraliza horizontalmente */
+  align-items: center;
+  /* Centraliza verticalmente */
+  height: 100vh;
+  /* Ocupa a altura total da tela */
+  padding-top: 0;
+  /* Remove o espaço da navbar */
+}
+
+/* === CONTAINER DO FORMULÁRIO === */
+.login-container {
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+  background: rgba(27, 27, 27, 0.9);
+  /* Transparente pro vídeo aparecer */
+  color: white;
+  padding: 100px 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  /* efeito vidro */
+  animation: fadeIn 0.8s ease;
+  /* entrada suave */
+}
+
+.login-inner-box {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 25px;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+
+/* === TÍTULO === */
+.login-container h2 {
+
+  margin-bottom: 40px;
+  font-size: 1.6rem;
+  letter-spacing: 0.5px;
+}
+
+/* === INPUTS === */
+.login-container input {
+  display: block;
+  width: 100%;
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+  background: #2a2a2a;
+  color: white;
+  font-size: 15px;
+  transition: all 0.2s ease;
+}
+
+.login-container input:focus {
+  outline: 2px solid #00b7ff;
+  background: #222;
+}
+
+/* === BOTÃO === */
+.login-container button {
+  width: 100%;
+  padding: 12px;
+  background-color: #00b7ff;
+  border: none;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  transition: 0.25s ease;
+}
+
+.login-container button:hover {
+  background-color: #0093cc;
+  transform: scale(1.02);
+}
+
+/* === TEXTO INFERIOR === */
+.login-container p {
+  margin-top: 18px;
+  font-size: 14px;
+}
+
+.login-container .link {
+  color: #00b7ff;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.login-container .link:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,193 @@
+/* Variáveis de Cores */
+:root {
+  --bg-color: #121212;
+  /* Fundo escuro */
+  --text-color: #ffffff;
+  /* Texto branco */
+  --accent-color: #ffc107;
+  /* Amarelo/Dourado para destaque (Download) */
+  --hover-color: #f0f0f0;
+  /* Cor de hover para links */
+  --search-bg: #222222;
+  /* Fundo da caixa de busca */
+}
+
+/* Estilo Geral do Container da Navbar */
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  padding: 0 20px;
+  height: 60px;
+  /* Altura padrão de navbar */
+  font-family: 'Arial', sans-serif;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+
+  /* CORREÇÃO CRÍTICA: Garante que ela flutue acima de tudo */
+  position: fixed;
+  top: 0;
+  left: 0;
+  /* Garante que comece na borda esquerda */
+  width: 100%;
+  /* Ocupa 100% da largura da viewport */
+  z-index: 1000;
+  /* Z-index MUITO ALTO (maior que o vídeo -10) */
+}
+
+/* Seções Esquerda e Direita */
+.navbar-left,
+.navbar-right {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+/* Ícones e Logos */
+.logo-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--text-color);
+  font-size: 24px;
+  font-weight: bold;
+  margin-right: 15px;
+  height: 100%;
+  padding: 0 5px;
+}
+
+.epic-games-icon {
+  /* Simulação do logo da Epic Games */
+  font-size: 20px;
+  margin-right: 10px;
+}
+
+.btn-logout {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.btn-logout:hover {
+  background-color: #ff1a1a;
+}
+
+.fortnite-icon {
+  /* Simulação do logo do Fortnite */
+  font-size: 20px;
+}
+
+/* Links de Navegação */
+.nav-links {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.nav-links a {
+  color: var(--text-color);
+  text-decoration: none;
+  padding: 0 15px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.nav-links a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown a span {
+  margin-left: 5px;
+  font-size: 10px;
+}
+
+/* Caixa de Busca */
+.search-box {
+  display: flex;
+  align-items: center;
+  background-color: var(--search-bg);
+  border-radius: 4px;
+  padding: 5px 10px;
+  margin-right: 15px;
+}
+
+.search-icon {
+  font-size: 16px;
+  margin-right: 8px;
+  color: #aaa;
+  /* Cor mais clara para o ícone */
+}
+
+.search-box input {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 14px;
+  outline: none;
+  width: 200px;
+  /* Largura ajustável */
+}
+
+.search-box input::placeholder {
+  color: #aaa;
+}
+
+/* Botões */
+.btn {
+  text-decoration: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  margin-left: 10px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-login {
+  background-color: var(--accent-color);
+  color: var(--bg-color);
+  border: 1px solid transparent;
+}
+
+/* Estilo para o ícone de busca no lado direito, se for um link */
+.navbar-right .logo-link {
+  margin-right: 0;
+}
+
+/* Ajuste para o link "Entrar" que fica antes do botão "Download" */
+.navbar-right .btn-login {
+  margin-left: 0;
+  margin-right: 10px;
+}
+
+.fortnite-icon {
+  font-size: 2em;
+  /* Tamanho do ícone */
+  margin-right: 5px;
+  /* Espaço entre o ícone e a imagem */
+}
+
+.logo-image {
+  /* Propriedades chave para controlar o tamanho da imagem: */
+  height: 100%;
+  width: auto;
+  max-height: 40px;
+  object-fit: contain;
+}
