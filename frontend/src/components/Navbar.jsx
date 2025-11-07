@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../assets/Logo.png";
-import "./Navbar.css";
+import "../style/Navbar.css";
 
 const SearchIcon = () => <span className="icon search-icon">🔍</span>;
 
