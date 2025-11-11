@@ -1,141 +1,117 @@
+:root {
+  --cor-fundo-principal: #1a1a2e;
+  --cor-fundo-secundario: #2c2c4a;
+  --cor-texto-principal: #ffffff;
+  --cor-acento: #00e0ff;
+  --cor-borda-card: #3a3a5a;
+}
+
+/* Container geral */
 .loja-container {
-  padding: 40px;
-  color: #fff;
-  background: #121212;
+  padding: 40px 20px;
+  color: var(--cor-texto-principal);
+  background: var(--cor-fundo-principal);
   min-height: 100vh;
-  font-family: Arial, sans-serif;
+  font-family: 'Arial', sans-serif;
 }
 
-.loja-container h1 {
+/* Header (se quiser adicionar título acima) */
+.loja-header {
   text-align: center;
-  margin-bottom: 30px;
-  font-size: 28px;
+  margin-bottom: 24px;
 }
 
+/* Filtros */
 .filtros-container {
   display: flex;
   flex-wrap: wrap;
   gap: 15px;
   justify-content: center;
-  background: #1e1e1e;
+  background: var(--cor-fundo-secundario);
   padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 30px;
+  border-radius: 10px;
+  margin-bottom: 40px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
-.filtros-container input,
-.filtros-container select {
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: none;
-  background: #2c2c2c;
-  color: white;
+.filtro-input,
+.filtro-select,
+.filtro-date {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid var(--cor-borda-card);
+  background: #1a1a2e;
+  color: var(--cor-texto-principal);
+  transition: border-color 0.3s;
+}
+
+.filtro-input:focus,
+.filtro-select:focus {
+  border-color: var(--cor-acento);
+  outline: none;
 }
 
 .data-filtro {
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-
-.checkbox-group {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-}
-
-.grid-cosmeticos {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 25px;
-}
-
-.card-cosmetico {
-  background: #1e1e1e;
-  border-radius: 8px;
-  text-align: center;
-  padding: 15px;
-  transition: transform 0.2s, box-shadow 0.3s;
-}
-
-.card-cosmetico:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 0 10px #00b7ff;
-}
-
-.card-cosmetico img {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-radius: 6px;
-}
-
-.raridade {
-  text-transform: capitalize;
-  font-weight: bold;
-}
-
-.raridade.common { color: #a0a0a0; }
-.raridade.rare { color: #3b82f6; }
-.raridade.epic { color: #a855f7; }
-.raridade.legendary { color: #f59e0b; }
-
-.preco {
-  margin-top: 8px;
-  color: #00b7ff;
-  font-weight: bold;
-}
-
-.sem-resultados {
-  text-align: center;
-  width: 100%;
+  gap: 10px;
   color: #ccc;
 }
 
-/* ===== Botão Ver Detalhes ===== */
-.btn-detalhes {
-  display: inline-block;
-  margin-top: 12px;
-  padding: 8px 12px;
-  background-color: #00b7ff;      /* azul vívido */
-  color: #fff;
+/* Grid de cards (apenas layout) */
+.grid-cosmeticos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 30px;
+}
+
+/* Se preferir centralizar texto quando estiver vazio */
+.sem-resultados {
+  text-align: center;
+  width: 100%;
+  grid-column: 1 / -1;
+  color: #ccc;
+  padding: 50px 0;
+  font-size: 1.2rem;
+}
+
+/* Paginação */
+.paginacao-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 40px;
+}
+
+.btn-paginacao {
+  padding: 10px 15px;
+  background-color: #3a3a5a;
+  color: var(--cor-texto-principal);
   border: none;
-  border-radius: 8px;
-  font-weight: 600;
+  border-radius: 6px;
   cursor: pointer;
-  transition: transform 0.14s ease, box-shadow 0.14s ease, background-color 0.14s ease;
-  box-shadow: 0 6px 18px rgba(0, 183, 255, 0.08);
-  text-decoration: none;
+  font-weight: bold;
 }
 
-/* efeito hover / active */
-.btn-detalhes:hover {
-  transform: translateY(-3px);
-  background-color: #0093cc;
-  box-shadow: 0 10px 24px rgba(0, 147, 204, 0.14);
+.btn-paginacao.ativo {
+  background-color: var(--cor-acento);
+  color: var(--cor-fundo-principal);
+  box-shadow: 0 0 8px rgba(0, 224, 255, 0.7);
 }
 
-.btn-detalhes:active {
-  transform: translateY(0);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-}
-
-/* pequeno ajuste para telas pequenas */
-@media (max-width: 480px) {
-  .btn-detalhes {
-    width: 100%;
-    padding: 10px;
-    border-radius: 6px;
+/* Responsividade */
+@media (max-width: 768px) {
+  .grid-cosmeticos {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   }
-}
 
-/* Opcional: estilo para separar o botão do preço e alinhar ao centro */
-.card-cosmetico .preco {
-  margin-bottom: 8px;
-}
+  .filtros-container {
+    gap: 10px;
+  }
 
-.card-cosmetico .btn-detalhes {
-  margin-left: auto;
-  margin-right: auto;
-  display: block; /* centraliza no card */
+  .data-filtro {
+    flex-direction: column;
+    gap: 8px;
+  }
 }

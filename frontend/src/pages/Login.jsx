@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import "./Login.css";
@@ -9,6 +9,16 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const navigate = useNavigate();
+
+  // 🔹 Redireciona se já estiver logado
+  useEffect(() => {
+    const user = localStorage.getItem("usuario");
+    if (user && window.location.pathname === "/") {
+      setTimeout(() => {
+        navigate("/loja", { replace: true });
+      }, 0);
+    }
+  }, [navigate]);
 
   const alternarModo = () => {
     setModo(modo === "login" ? "registrar" : "login");
@@ -23,12 +33,15 @@ export default function Login() {
     try {
       if (modo === "login") {
         const resposta = await api.post("/auth/login", { email, senha });
+
+        // 🔹 Salva usuário no localStorage
         localStorage.setItem("usuario", JSON.stringify(resposta.data.usuario));
 
-        // 🔹 Dispara evento global para a Navbar atualizar automaticamente
+        // 🔹 Atualiza Navbar ou outros componentes
         window.dispatchEvent(new Event("usuarioChange"));
 
-        navigate("/loja");
+        // 🔹 Redireciona
+        navigate("/loja", { replace: true });
       } else {
         await api.post("/auth/registrar", { name: nome, email, senha });
         alert("Conta criada com sucesso! Faça login.");

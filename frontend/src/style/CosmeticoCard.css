@@ -1,0 +1,141 @@
+/* ----------------------------
+   Estilos do componente CosmeticoCard
+   (separado do Loja.css)
+   ---------------------------- */
+
+.card-cosmetico {
+  background: var(--cor-fundo-secundario);
+  border-radius: 12px;
+  overflow: hidden;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s, box-shadow 0.3s;
+  border: 1px solid var(--cor-borda-card);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* badge "NOVO" no canto superior esquerdo do card */
+.badge-novo {
+  position: absolute;
+  margin: 12px;
+  background: linear-gradient(90deg, #ff6b6b, #ffb86b);
+  color: #111;
+  font-weight: 800;
+  font-size: 12px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  z-index: 2;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+/* wrapper imagem */
+.card-imagem {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.15));
+  border-bottom: 1px solid var(--cor-borda-card);
+}
+
+.card-imagem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.card-cosmetico:hover .card-imagem img {
+  transform: scale(1.05);
+}
+
+.card-info {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card-titulo {
+  font-size: 1.1em;
+  color: var(--cor-texto-principal);
+  margin: 0;
+}
+
+/* detalhes (tipo + raridade) */
+.card-detalhes {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.card-tipo {
+  font-size: 0.9em;
+  color: #aaa;
+}
+
+/* raridade: evita quebra visual com borda */
+.card-raridade {
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(0,0,0,0.12);
+}
+
+/* rodapé com preço */
+.card-footer {
+  border-top: 1px solid var(--cor-borda-card);
+  padding-top: 10px;
+  margin-top: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-preco {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--cor-acento);
+}
+
+/* botão detalhes */
+.btn-detalhes {
+  display: inline-block;
+  margin: 12px auto 0;
+  padding: 8px 15px;
+  background-color: var(--cor-acento);
+  color: var(--cor-fundo-principal);
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.08s;
+}
+
+.btn-detalhes:hover {
+  background-color: #00b7ff;
+  transform: translateY(-2px);
+}
+
+/* hover do card (sombra e elevação) */
+.card-cosmetico:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 25px rgba(0, 224, 255, 0.12);
+}
+
+/* pequenas correções responsivas */
+@media (max-width: 480px) {
+  .card-imagem { height: 180px; }
+  .badge-novo { font-size: 11px; padding: 5px 7px; }
+}

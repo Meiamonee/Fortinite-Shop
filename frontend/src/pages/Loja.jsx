@@ -1,24 +1,31 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
+import CosmeticoCard from "../components/CosmeticoCard";
 import "../style/Loja.css";
 
 export default function Loja() {
+  const navigate = useNavigate();
   const [cosmeticos, setCosmeticos] = useState([]);
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const itensPorPagina = 24;
   const [filtro, setFiltro] = useState({
     nome: "",
     tipo: "",
     raridade: "",
     dataInicio: "",
     dataFim: "",
-    novos: false,
-    loja: false,
-    promocao: false,
   });
 
-  const navigate = useNavigate();
+  // 🔹 Bloqueia acesso se não estiver logado
+  useEffect(() => {
+    const user = localStorage.getItem("usuario");
+    if (!user) {
+      navigate("/", { replace: true });
+    }
+  }, [navigate]);
 
-  // Carrega cosméticos
+  // 🔹 Carrega cosméticos
   useEffect(() => {
     async function carregarCosmeticos() {
       try {
@@ -31,7 +38,7 @@ export default function Loja() {
     carregarCosmeticos();
   }, []);
 
-  // Filtragem local
+  // 🔹 Filtragem local
   const cosmeticosFiltrados = cosmeticos.filter((item) => {
     const nomeMatch = item.nome.toLowerCase().includes(filtro.nome.toLowerCase());
     const tipoMatch = filtro.tipo ? item.tipo === filtro.tipo : true;
@@ -41,26 +48,48 @@ export default function Loja() {
     const inicioMatch = filtro.dataInicio ? dataItem >= new Date(filtro.dataInicio) : true;
     const fimMatch = filtro.dataFim ? dataItem <= new Date(filtro.dataFim) : true;
 
-    const novosMatch = filtro.novos ? item.status === "novo" : true;
-    const lojaMatch = filtro.loja ? item.status === "loja" : true;
-    const promocaoMatch = filtro.promocao ? item.status === "promocao" : true;
-
-    return (
-      nomeMatch &&
-      tipoMatch &&
-      raridadeMatch &&
-      inicioMatch &&
-      fimMatch &&
-      novosMatch &&
-      lojaMatch &&
-      promocaoMatch
-    );
+    return nomeMatch && tipoMatch && raridadeMatch && inicioMatch && fimMatch;
   });
+
+  // 🔹 Paginação
+  const totalPaginas = Math.ceil(cosmeticosFiltrados.length / itensPorPagina);
+  const indiceInicial = (paginaAtual - 1) * itensPorPagina;
+  const cosmeticosPaginados = cosmeticosFiltrados.slice(indiceInicial, indiceInicial + itensPorPagina);
+
+  const irParaPagina = (pagina) => {
+    if (pagina >= 1 && pagina <= totalPaginas) {
+      setPaginaAtual(pagina);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  useEffect(() => setPaginaAtual(1), [filtro]);
+
+  // 🔹 Páginas exibidas
+  const gerarPaginasExibidas = () => {
+    const paginas = [];
+    const MAX_PAGINAS_EXIBIDAS = 5;
+    let inicio = Math.max(1, paginaAtual - Math.floor(MAX_PAGINAS_EXIBIDAS / 2));
+    let fim = Math.min(totalPaginas, inicio + MAX_PAGINAS_EXIBIDAS - 1);
+    if (fim - inicio < MAX_PAGINAS_EXIBIDAS - 1) {
+      inicio = Math.max(1, fim - MAX_PAGINAS_EXIBIDAS + 1);
+    }
+    if (inicio > 1) {
+      paginas.push(1);
+      if (inicio > 2) paginas.push("...");
+    }
+    for (let i = inicio; i <= fim; i++) paginas.push(i);
+    if (fim < totalPaginas) {
+      if (fim < totalPaginas - 1) paginas.push("...");
+      paginas.push(totalPaginas);
+    }
+    return paginas;
+  };
+
+  const paginasExibidas = gerarPaginasExibidas();
 
   return (
     <div className="loja-container">
-      <h1>🛍️ Loja de Cosméticos</h1>
-
       {/* 🔹 Filtros */}
       <div className="filtros-container">
         <input
@@ -68,11 +97,13 @@ export default function Loja() {
           placeholder="Buscar por nome..."
           value={filtro.nome}
           onChange={(e) => setFiltro({ ...filtro, nome: e.target.value })}
+          className="filtro-input"
         />
 
         <select
           value={filtro.tipo}
           onChange={(e) => setFiltro({ ...filtro, tipo: e.target.value })}
+          className="filtro-select"
         >
           <option value="">Tipo</option>
           <option value="outfit">Outfit</option>
@@ -84,6 +115,7 @@ export default function Loja() {
         <select
           value={filtro.raridade}
           onChange={(e) => setFiltro({ ...filtro, raridade: e.target.value })}
+          className="filtro-select"
         >
           <option value="">Raridade</option>
           <option value="common">Comum</option>
@@ -98,68 +130,58 @@ export default function Loja() {
             type="date"
             value={filtro.dataInicio}
             onChange={(e) => setFiltro({ ...filtro, dataInicio: e.target.value })}
+            className="filtro-date"
           />
           <label>Até:</label>
           <input
             type="date"
             value={filtro.dataFim}
             onChange={(e) => setFiltro({ ...filtro, dataFim: e.target.value })}
+            className="filtro-date"
           />
-        </div>
-
-        <div className="checkbox-group">
-          <label>
-            <input
-              type="checkbox"
-              checked={filtro.novos}
-              onChange={() => setFiltro({ ...filtro, novos: !filtro.novos })}
-            />
-            Novos
-          </label>
-
-          <label>
-            <input
-              type="checkbox"
-              checked={filtro.loja}
-              onChange={() => setFiltro({ ...filtro, loja: !filtro.loja })}
-            />
-            À venda
-          </label>
-
-          <label>
-            <input
-              type="checkbox"
-              checked={filtro.promocao}
-              onChange={() => setFiltro({ ...filtro, promocao: !filtro.promocao })}
-            />
-            Promoção
-          </label>
         </div>
       </div>
 
       {/* 🔹 Listagem */}
       <div className="grid-cosmeticos">
-        {cosmeticosFiltrados.map((item) => (
-          <div key={item._id} className="card-cosmetico">
-            <img src={item.imagem} alt={item.nome} />
-            <h3>{item.nome}</h3>
-            <p>{item.tipo}</p>
-            <p className={`raridade ${item.raridade}`}>{item.raridade}</p>
-            <p className="preco">{item.preco} V-Bucks</p>
-
-            <button
-              className="btn-detalhes"
-              onClick={() => navigate(`/cosmetico/${item._id}`)}
-            >
-              Ver Detalhes
-            </button>
-          </div>
+        {cosmeticosPaginados.map((item) => (
+          <CosmeticoCard key={item._id} item={item} />
         ))}
-
-        {cosmeticosFiltrados.length === 0 && (
+        {cosmeticosPaginados.length === 0 && (
           <p className="sem-resultados">Nenhum cosmético encontrado 😢</p>
         )}
       </div>
+
+      {/* 🔹 Paginação */}
+      {totalPaginas > 1 && (
+        <div className="paginacao-container">
+          <button className="btn-paginacao" onClick={() => irParaPagina(paginaAtual - 1)} disabled={paginaAtual === 1}>
+            ← Anterior
+          </button>
+
+          {paginasExibidas.map((pagina, i) =>
+            pagina === "..." ? (
+              <span key={`ellipsis-${i}`} className="reticencias">...</span>
+            ) : (
+              <button
+                key={`page-${pagina}`}
+                className={`btn-paginacao ${paginaAtual === pagina ? "ativo" : ""}`}
+                onClick={() => irParaPagina(pagina)}
+              >
+                {pagina}
+              </button>
+            )
+          )}
+
+          <button
+            className="btn-paginacao"
+            onClick={() => irParaPagina(paginaAtual + 1)}
+            disabled={paginaAtual === totalPaginas}
+          >
+            Próxima →
+          </button>
+        </div>
+      )}
     </div>
   );
 }
