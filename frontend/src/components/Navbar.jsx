@@ -46,7 +46,6 @@ export default function Navbar() {
         {usuario && (
           <nav className="nav-links">
             <Link to="/loja">Loja</Link>
-            <Link to="/inventario">Inventário</Link>
             <Link to="/historico">Histórico</Link>
             <Link to="/perfil">Perfil</Link>
           </nav>

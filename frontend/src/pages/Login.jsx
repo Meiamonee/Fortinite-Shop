@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
-import "./Login.css";
+import "../style/Login.css";
 
 export default function Login() {
   const [modo, setModo] = useState("login"); // 'login' ou 'registrar'

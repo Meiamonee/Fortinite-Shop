@@ -7,7 +7,6 @@ import {
 } from "react-router-dom";
 import Login from "./pages/Login";
 import Loja from "./pages/Loja";
-import Inventario from "./pages/Inventario";
 import Historico from "./pages/Historico";
 import Perfil from "./pages/Perfil";
 import Navbar from "./components/Navbar";
@@ -72,10 +71,9 @@ function AppContent() {
 
           {/* 🔹 Outras páginas (também protegidas) */}
           <Route
-            path="/inventario"
-            element={usuario ? <Inventario /> : <Navigate to="/" replace />}
-          />
-          <Route path="/cosmetico/:id" element={<CosmeticoDetalhe />} />
+           path="/cosmetico/:id" 
+           element={<CosmeticoDetalhe />}
+           />
 
           <Route
             path="/historico"

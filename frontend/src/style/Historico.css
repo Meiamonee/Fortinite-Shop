@@ -1,0 +1,187 @@
+/* src/style/Historico.css */
+
+/* Container geral — ocupa toda a tela */
+.historico-container {
+  width: 100%;
+  height: 100vh; /* ocupa 100% da altura da janela */
+  margin: 0;
+  padding: 30px;
+  background-color: #0f0f14; /* fundo escuro padrão */
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto; /* permite rolar se tiver muitos itens */
+  box-sizing: border-box;
+}
+
+.botao-reembolso:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #666;
+}
+
+.botao-reembolso:disabled:hover {
+  background: #666;
+  transform: none;
+}
+
+/* Título */
+.titulo-historico {
+  text-align: center;
+  color: #00e0ff;
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 25px;
+  text-transform: uppercase;
+}
+
+/* Mensagem quando não há histórico */
+.mensagem-vazia {
+  text-align: center;
+  color: #bdbdbd;
+  font-size: 1.1rem;
+  margin-top: 40px;
+}
+
+/* Lista dos itens */
+.historico-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 95%;
+  max-width: 1300px;
+}
+
+/* Cada item */
+.historico-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #1a1a20;
+  border-radius: 10px;
+  padding: 16px 20px;
+  border-left: 6px solid transparent;
+}
+
+/* Tipos */
+.historico-item.compra {
+  border-left-color: #00e0ff;
+}
+
+.historico-item.reembolso {
+  border-left-color: #ffb703;
+}
+
+/* Imagem do cosmético */
+.historico-imagem {
+  flex: 0 0 100px;
+  width: 100px;
+  height: 100px;
+}
+
+.historico-imagem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* Informações */
+.historico-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-left: 15px;
+}
+
+/* Nome do produto */
+.historico-info h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #ffffff;
+}
+
+/* Texto comum */
+.historico-info p {
+  margin: 0;
+  color: #cfcfcf;
+  font-size: 0.95rem;
+}
+
+/* Valor */
+.historico-valor {
+  color: #ffcc00;
+  font-weight: bold;
+}
+
+/* Data */
+.historico-data {
+  color: #aaaaaa;
+  font-size: 0.9rem;
+}
+
+/* ID do usuário */
+.historico-usuario-id {
+  background-color: rgba(255,255,255,0.05);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  color: #dddddd;
+  width: fit-content;
+}
+
+/* Botão de reembolso */
+.botao-reembolso {
+  background: linear-gradient(135deg, #ffeb3b, #ffc107);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.botao-reembolso:hover {
+  opacity: 0.85;
+}
+
+/* Notificação simples */
+.notificacao {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background-color: #4caf50;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+}
+
+.notificacao.erro {
+  background-color: #f44336;
+}
+
+/* Responsividade */
+@media (max-width: 900px) {
+  .historico-item {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .historico-info {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+
+  .botao-reembolso {
+    margin-top: 10px;
+    width: 100%;
+  }
+}

@@ -10,6 +10,7 @@ export default function CosmeticoDetalhe() {
   const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(true);
   const [comprando, setComprando] = useState(false);
+  const [mensagemCompra, setMensagemCompra] = useState(""); // ✅ novo estado
 
   useEffect(() => {
     async function carregar() {
@@ -18,15 +19,11 @@ export default function CosmeticoDetalhe() {
         if (userString) {
           const userData = JSON.parse(userString);
           setUsuario(userData);
-          console.log("✅ Usuário carregado:", userData); // DEBUG
-        } else {
-          console.warn("⚠️ Nenhum usuário no localStorage");
         }
 
         const resposta = await api.get("/cosmeticos");
         const item = resposta.data.find((c) => c._id === id);
         setCosmetico(item || null);
-        console.log("✅ Cosmético carregado:", item); // DEBUG
       } catch (erro) {
         console.error("❌ Erro ao carregar cosmético:", erro);
       } finally {
@@ -59,18 +56,12 @@ export default function CosmeticoDetalhe() {
 
   const comprarItem = async () => {
     if (!usuario || !cosmetico) {
-      alert("Usuário ou cosmético não encontrado.");
+      setMensagemCompra("Usuário ou cosmético não encontrado.");
+      setTimeout(() => setMensagemCompra(""), 4000);
       return;
     }
 
-    // 🔍 DEBUG: Verificar dados antes de enviar
     const usuarioId = usuario._id || usuario.id;
-    console.log("📦 Dados da compra:", {
-      usuarioId: usuarioId,
-      cosmeticoId: cosmetico._id,
-      usuario: usuario,
-      cosmetico: cosmetico,
-    });
 
     try {
       setComprando(true);
@@ -80,43 +71,33 @@ export default function CosmeticoDetalhe() {
         cosmeticoId: cosmetico._id,
       };
 
-      console.log("🚀 Enviando requisição POST para /compras/comprar");
-      console.log("📤 Payload:", payload);
-
       const resposta = await api.post("/compras/comprar", payload);
 
-      console.log("✅ Resposta recebida:", resposta.data);
+      // ✅ Mostra card verde
+      setMensagemCompra(resposta.data.mensagem || "Compra realizada com sucesso!");
+      setTimeout(() => setMensagemCompra(""), 4000);
 
-      alert(resposta.data.mensagem || "Compra realizada com sucesso!");
-
-      // Atualiza localStorage com o novo estado do usuário
+      // Atualiza localStorage
       const usuarioAtualizado = {
         ...usuario,
         creditos: resposta.data.creditosRestantes,
         cosmeticosComprados: resposta.data.cosmeticosComprados,
       };
-      
+
       localStorage.setItem("usuario", JSON.stringify(usuarioAtualizado));
       setUsuario(usuarioAtualizado);
-      
-      // 🔥 NOTIFICA A NAVBAR E OUTROS COMPONENTES SOBRE A ATUALIZAÇÃO
       window.dispatchEvent(new Event("usuarioChange"));
-      
-      console.log("✅ Usuário atualizado:", usuarioAtualizado);
-
     } catch (erro) {
       console.error("❌ Erro completo:", erro);
-      console.error("❌ Resposta do erro:", erro.response);
-      console.error("❌ Dados do erro:", erro.response?.data);
-      console.error("❌ Status do erro:", erro.response?.status);
-      
-      const mensagemErro = 
-        erro.response?.data?.mensagem || 
+      const mensagemErro =
+        erro.response?.data?.mensagem ||
         erro.response?.data?.message ||
         erro.message ||
         "Erro ao realizar compra. Tente novamente.";
-      
-      alert(mensagemErro);
+
+      // ❌ Mostra card vermelho no erro
+      setMensagemCompra(mensagemErro);
+      setTimeout(() => setMensagemCompra(""), 4000);
     } finally {
       setComprando(false);
     }
@@ -204,6 +185,17 @@ export default function CosmeticoDetalhe() {
           <img src={cosmetico.imagem} alt={cosmetico.nome} />
         </div>
       </div>
+
+      {/* ✅ CARD DE NOTIFICAÇÃO */}
+      {mensagemCompra && (
+        <div
+          className={`notificacao ${
+            mensagemCompra.toLowerCase().includes("erro") ? "erro" : "sucesso"
+          }`}
+        >
+          {mensagemCompra}
+        </div>
+      )}
     </div>
   );
 }
