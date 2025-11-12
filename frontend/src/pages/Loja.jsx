@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import CosmeticoCard from "../components/CosmeticoCard";
+import Paginacao from "../components/Paginacao";
 import "../style/Loja.css";
 
 export default function Loja() {
@@ -156,7 +157,7 @@ export default function Loja() {
       {totalPaginas > 1 && (
         <div className="paginacao-container">
           <button className="btn-paginacao" onClick={() => irParaPagina(paginaAtual - 1)} disabled={paginaAtual === 1}>
-            ← Anterior
+             Anterior
           </button>
 
           {paginasExibidas.map((pagina, i) =>
@@ -178,7 +179,7 @@ export default function Loja() {
             onClick={() => irParaPagina(paginaAtual + 1)}
             disabled={paginaAtual === totalPaginas}
           >
-            Próxima →
+            Próxima 
           </button>
         </div>
       )}

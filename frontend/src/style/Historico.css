@@ -96,6 +96,63 @@
   margin-left: 15px;
 }
 
+/* Adicione ao final do arquivo Historico.css */
+
+/* Paginação (mesmo estilo da Loja) */
+.paginacao-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 40px;
+  padding-bottom: 20px;
+}
+
+.btn-paginacao {
+  padding: 10px 15px;
+  background-color: #3a3a5a;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.btn-paginacao:hover:not(:disabled) {
+  background-color: #4a4a6a;
+  transform: translateY(-2px);
+}
+
+.btn-paginacao:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-paginacao.ativo {
+  background-color: #00e0ff;
+  color: #1a1a2e;
+  box-shadow: 0 0 8px rgba(0, 224, 255, 0.7);
+}
+
+.reticencias {
+  color: #ffffff;
+  padding: 0 5px;
+  font-weight: bold;
+}
+
+/* Responsividade da paginação */
+@media (max-width: 768px) {
+  .paginacao-container {
+    gap: 5px;
+  }
+
+  .btn-paginacao {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+}
+
 /* Nome do produto */
 .historico-info h3 {
   margin: 0;

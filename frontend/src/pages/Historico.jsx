@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
+import Paginacao from "../components/Paginacao";
 import "../style/Historico.css";
 
 export default function Historico() {
@@ -10,6 +11,8 @@ export default function Historico() {
   const [loading, setLoading] = useState(true);
   const [mensagem, setMensagem] = useState("");
   const [processandoReembolso, setProcessandoReembolso] = useState(null);
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const itensPorPagina = 10;
   const navigate = useNavigate();
 
   // Memoiza o set de itens reembolsados para evitar recalcular sempre
@@ -23,6 +26,51 @@ export default function Historico() {
     });
     return reembolsados;
   }, [historico]);
+
+  // 🔹 Paginação
+  const totalPaginas = Math.ceil(historico.length / itensPorPagina);
+  const indiceInicial = (paginaAtual - 1) * itensPorPagina;
+  const historicoPaginado = historico.slice(indiceInicial, indiceInicial + itensPorPagina);
+
+  const irParaPagina = (pagina) => {
+    if (pagina >= 1 && pagina <= totalPaginas) {
+      setPaginaAtual(pagina);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  // Reseta para página 1 quando o histórico muda
+  useEffect(() => {
+    setPaginaAtual(1);
+  }, [historico.length]);
+
+  // 🔹 Páginas exibidas (igual à Loja)
+  const gerarPaginasExibidas = () => {
+    const paginas = [];
+    const MAX_PAGINAS_EXIBIDAS = 5;
+    let inicio = Math.max(1, paginaAtual - Math.floor(MAX_PAGINAS_EXIBIDAS / 2));
+    let fim = Math.min(totalPaginas, inicio + MAX_PAGINAS_EXIBIDAS - 1);
+    
+    if (fim - inicio < MAX_PAGINAS_EXIBIDAS - 1) {
+      inicio = Math.max(1, fim - MAX_PAGINAS_EXIBIDAS + 1);
+    }
+    
+    if (inicio > 1) {
+      paginas.push(1);
+      if (inicio > 2) paginas.push("...");
+    }
+    
+    for (let i = inicio; i <= fim; i++) paginas.push(i);
+    
+    if (fim < totalPaginas) {
+      if (fim < totalPaginas - 1) paginas.push("...");
+      paginas.push(totalPaginas);
+    }
+    
+    return paginas;
+  };
+
+  const paginasExibidas = gerarPaginasExibidas();
 
   // Função para buscar histórico otimizada com useCallback
   const buscarHistorico = useCallback(async (usuarioId) => {
@@ -199,9 +247,46 @@ export default function Historico() {
       {historico.length === 0 ? (
         <p className="mensagem-vazia">Nenhuma transação encontrada.</p>
       ) : (
-        <div className="historico-lista">
-          {historico.map(renderHistoricoItem)}
-        </div>
+        <>
+          <div className="historico-lista">
+            {historicoPaginado.map(renderHistoricoItem)}
+          </div>
+
+          {/* 🔹 Paginação */}
+          {totalPaginas > 1 && (
+            <div className="paginacao-container">
+              <button 
+                className="btn-paginacao" 
+                onClick={() => irParaPagina(paginaAtual - 1)} 
+                disabled={paginaAtual === 1}
+              >
+                 Anterior
+              </button>
+
+              {paginasExibidas.map((pagina, i) =>
+                pagina === "..." ? (
+                  <span key={`ellipsis-${i}`} className="reticencias">...</span>
+                ) : (
+                  <button
+                    key={`page-${pagina}`}
+                    className={`btn-paginacao ${paginaAtual === pagina ? "ativo" : ""}`}
+                    onClick={() => irParaPagina(pagina)}
+                  >
+                    {pagina}
+                  </button>
+                )
+              )}
+
+              <button
+                className="btn-paginacao"
+                onClick={() => irParaPagina(paginaAtual + 1)}
+                disabled={paginaAtual === totalPaginas}
+              >
+                Próxima 
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       {mensagem && (
