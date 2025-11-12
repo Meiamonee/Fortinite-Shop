@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import "../style/CosmeticoCard.css"; // CSS específico do card
+import "../style/CosmeticoCard.css";
+import vbucksIcon from "../assets/v-bucks.png"; // 🔹 IMPORTAR IMAGEM
 
 export default function CosmeticoCard({ item }) {
   const navigate = useNavigate();
@@ -47,7 +48,8 @@ export default function CosmeticoCard({ item }) {
 
         <div className="card-footer">
           <div className="card-preco">
-            <span className="icone-vbucks">🎮</span>
+            {/* 🔹 SUBSTITUIR EMOJI POR IMAGEM */}
+            <img src={vbucksIcon} alt="V-Bucks" className="icone-vbucks" />
             <span className="valor">{item.preco}</span>
           </div>
         </div>

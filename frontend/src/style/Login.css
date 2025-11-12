@@ -7,13 +7,9 @@ html {
 .container.login-active {
   display: flex;
   justify-content: center;
-  /* Centraliza horizontalmente */
   align-items: center;
-  /* Centraliza verticalmente */
   height: 100vh;
-  /* Ocupa a altura total da tela */
   padding-top: 0;
-  /* Remove o espaço da navbar */
 }
 
 /* === CONTAINER DO FORMULÁRIO === */

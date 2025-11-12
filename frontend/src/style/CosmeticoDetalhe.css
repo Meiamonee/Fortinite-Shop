@@ -57,6 +57,10 @@
   font-weight: bold;
   color: #ffcc00;
   text-shadow: 0 0 15px rgba(255, 235, 59, 0.4);
+  display: flex;
+  align-items: center; /* 🔹 Alinha verticalmente ao centro */
+  gap: 10px;
+  margin: 15px 0; /* 🔹 Adiciona espaçamento */
 }
 
 /* === Ícones de status === */
@@ -139,6 +143,21 @@
 .btn-voltar:hover {
   background-color: #38385e;
   transform: translateY(-2px);
+}
+
+/* Ícone V-Bucks grande na página de detalhes */
+.vbucks-icone-grande {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  flex-shrink: 0; /* 🔹 Impede que o ícone encolha */
+  filter: 
+    invert(50%)
+    sepia(100%)
+    saturate(5000%)
+    hue-rotate(180deg)
+    brightness(1.1)
+    drop-shadow(0 3px 6px rgba(0, 224, 255, 0.5));
 }
 
 /* === Imagem do item === */

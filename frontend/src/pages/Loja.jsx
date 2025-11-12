@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import CosmeticoCard from "../components/CosmeticoCard";
-import Paginacao from "../components/Paginacao";
+import Paginacao from "../components/Paginacao"; // 🔹 IMPORTAR COMPONENTE
 import "../style/Loja.css";
 
 export default function Loja() {
@@ -57,37 +57,12 @@ export default function Loja() {
   const indiceInicial = (paginaAtual - 1) * itensPorPagina;
   const cosmeticosPaginados = cosmeticosFiltrados.slice(indiceInicial, indiceInicial + itensPorPagina);
 
-  const irParaPagina = (pagina) => {
-    if (pagina >= 1 && pagina <= totalPaginas) {
-      setPaginaAtual(pagina);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+  // 🔹 Função para mudar de página
+  const handleMudarPagina = (novaPagina) => {
+    setPaginaAtual(novaPagina);
   };
 
   useEffect(() => setPaginaAtual(1), [filtro]);
-
-  // 🔹 Páginas exibidas
-  const gerarPaginasExibidas = () => {
-    const paginas = [];
-    const MAX_PAGINAS_EXIBIDAS = 5;
-    let inicio = Math.max(1, paginaAtual - Math.floor(MAX_PAGINAS_EXIBIDAS / 2));
-    let fim = Math.min(totalPaginas, inicio + MAX_PAGINAS_EXIBIDAS - 1);
-    if (fim - inicio < MAX_PAGINAS_EXIBIDAS - 1) {
-      inicio = Math.max(1, fim - MAX_PAGINAS_EXIBIDAS + 1);
-    }
-    if (inicio > 1) {
-      paginas.push(1);
-      if (inicio > 2) paginas.push("...");
-    }
-    for (let i = inicio; i <= fim; i++) paginas.push(i);
-    if (fim < totalPaginas) {
-      if (fim < totalPaginas - 1) paginas.push("...");
-      paginas.push(totalPaginas);
-    }
-    return paginas;
-  };
-
-  const paginasExibidas = gerarPaginasExibidas();
 
   return (
     <div className="loja-container">
@@ -153,36 +128,12 @@ export default function Loja() {
         )}
       </div>
 
-      {/* 🔹 Paginação */}
-      {totalPaginas > 1 && (
-        <div className="paginacao-container">
-          <button className="btn-paginacao" onClick={() => irParaPagina(paginaAtual - 1)} disabled={paginaAtual === 1}>
-             Anterior
-          </button>
-
-          {paginasExibidas.map((pagina, i) =>
-            pagina === "..." ? (
-              <span key={`ellipsis-${i}`} className="reticencias">...</span>
-            ) : (
-              <button
-                key={`page-${pagina}`}
-                className={`btn-paginacao ${paginaAtual === pagina ? "ativo" : ""}`}
-                onClick={() => irParaPagina(pagina)}
-              >
-                {pagina}
-              </button>
-            )
-          )}
-
-          <button
-            className="btn-paginacao"
-            onClick={() => irParaPagina(paginaAtual + 1)}
-            disabled={paginaAtual === totalPaginas}
-          >
-            Próxima 
-          </button>
-        </div>
-      )}
+      {/* 🔹 USAR COMPONENTE DE PAGINAÇÃO */}
+      <Paginacao
+        paginaAtual={paginaAtual}
+        totalPaginas={totalPaginas}
+        onMudarPagina={handleMudarPagina}
+      />
     </div>
   );
 }

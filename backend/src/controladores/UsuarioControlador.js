@@ -47,3 +47,28 @@ export const listarCosmeticosDoUsuario = async (req, res) => {
     res.status(500).json({ mensagem: "Erro ao listar cosméticos do usuário." });
   }
 };
+
+// 🔹 Listar usuários públicos com paginação
+export const listarUsuariosPublicos = async (req, res) => {
+  try {
+    const { page = 1, limit = 12 } = req.query;
+    const skip = (page - 1) * limit;
+
+    const usuarios = await Usuario.find({}, "name email creditos cosmeticosComprados createdAt")
+      .skip(skip)
+      .limit(parseInt(limit))
+      .sort({ createdAt: -1 });
+
+    const total = await Usuario.countDocuments();
+
+    res.status(200).json({
+      usuarios,
+      totalPaginas: Math.ceil(total / limit),
+      paginaAtual: parseInt(page),
+      total
+    });
+  } catch (erro) {
+    console.error("Erro ao listar usuários públicos:", erro.message);
+    res.status(500).json({ mensagem: "Erro ao listar usuários." });
+  }
+};

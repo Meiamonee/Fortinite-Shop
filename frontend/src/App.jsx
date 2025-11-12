@@ -8,9 +8,10 @@ import {
 import Login from "./pages/Login";
 import Loja from "./pages/Loja";
 import Historico from "./pages/Historico";
-import Perfil from "./pages/Perfil";
 import Navbar from "./components/Navbar";
 import CosmeticoDetalhe from "./pages/CosmeticoDetalhe";
+import UsuariosPublicos from "./pages/UsuariosPublicos";
+import PerfilPublico from "./pages/PerfilPublico";
 
 
 
@@ -37,7 +38,6 @@ function AppContent() {
 
   return (
     <>
-      {/* 🔹 Exibe o vídeo de fundo só na página de login */}
       {isLoginPage && (
         <div className="video-background-container">
           <iframe
@@ -56,7 +56,7 @@ function AppContent() {
       )}
 
       {/* 🔹 Esconde a Navbar na tela de login */}
-      { <Navbar />}
+      {<Navbar />}
 
       <div className={`container ${isLoginPage ? "login-active" : ""}`}>
         <Routes>
@@ -71,18 +71,18 @@ function AppContent() {
 
           {/* 🔹 Outras páginas (também protegidas) */}
           <Route
-           path="/cosmetico/:id" 
-           element={<CosmeticoDetalhe />}
-           />
+            path="/cosmetico/:id"
+            element={<CosmeticoDetalhe />}
+          />
+
+          <Route path="/usuarios" element={<UsuariosPublicos />} />
+          <Route path="/usuario/:id" element={<PerfilPublico />} />
 
           <Route
             path="/historico"
             element={usuario ? <Historico /> : <Navigate to="/" replace />}
           />
-          <Route
-            path="/perfil"
-            element={usuario ? <Perfil /> : <Navigate to="/" replace />}
-          />
+       
 
           {/* 🔹 Rota inválida → redireciona para login */}
           <Route path="*" element={<Navigate to="/" replace />} />

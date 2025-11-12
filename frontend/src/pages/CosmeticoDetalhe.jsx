@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
+import vbucksIcon from "../assets/v-bucks.png"; // 🔹 IMPORTAR IMAGEM
 import "../style/CosmeticoDetalhe.css";
 
 export default function CosmeticoDetalhe() {
@@ -10,7 +11,7 @@ export default function CosmeticoDetalhe() {
   const [usuario, setUsuario] = useState(null);
   const [loading, setLoading] = useState(true);
   const [comprando, setComprando] = useState(false);
-  const [mensagemCompra, setMensagemCompra] = useState(""); // ✅ novo estado
+  const [mensagemCompra, setMensagemCompra] = useState("");
 
   useEffect(() => {
     async function carregar() {
@@ -73,11 +74,9 @@ export default function CosmeticoDetalhe() {
 
       const resposta = await api.post("/compras/comprar", payload);
 
-      // ✅ Mostra card verde
       setMensagemCompra(resposta.data.mensagem || "Compra realizada com sucesso!");
       setTimeout(() => setMensagemCompra(""), 4000);
 
-      // Atualiza localStorage
       const usuarioAtualizado = {
         ...usuario,
         creditos: resposta.data.creditosRestantes,
@@ -95,7 +94,6 @@ export default function CosmeticoDetalhe() {
         erro.message ||
         "Erro ao realizar compra. Tente novamente.";
 
-      // ❌ Mostra card vermelho no erro
       setMensagemCompra(mensagemErro);
       setTimeout(() => setMensagemCompra(""), 4000);
     } finally {
@@ -141,7 +139,11 @@ export default function CosmeticoDetalhe() {
 
           <p className="detalhe-tipo">Tipo: {cosmetico.tipo}</p>
 
-          <div className="detalhe-preco">🎮 {cosmetico.preco} V-Bucks</div>
+          {/* 🔹 SUBSTITUIR EMOJI POR IMAGEM */}
+          <div className="detalhe-preco">
+            <img src={vbucksIcon} alt="V-Bucks" className="vbucks-icone-grande" />
+            {cosmetico.preco} V-Bucks
+          </div>
 
           {icones.length > 0 && (
             <div className="detalhe-icones">
@@ -186,7 +188,6 @@ export default function CosmeticoDetalhe() {
         </div>
       </div>
 
-      {/* ✅ CARD DE NOTIFICAÇÃO */}
       {mensagemCompra && (
         <div
           className={`notificacao ${
