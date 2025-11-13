@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
-import vbucksIcon from "../assets/v-bucks.png"; // 🔹 IMPORTAR IMAGEM
+import vbucksIcon from "../assets/v-bucks.png";
 import "../style/CosmeticoDetalhe.css";
 
 export default function CosmeticoDetalhe() {
@@ -24,6 +24,9 @@ export default function CosmeticoDetalhe() {
 
         const resposta = await api.get("/cosmeticos");
         const item = resposta.data.find((c) => c._id === id);
+        
+        console.log("🔍 Cosmético encontrado:", item); // 🔹 DEBUG
+        
         setCosmetico(item || null);
       } catch (erro) {
         console.error("❌ Erro ao carregar cosmético:", erro);
@@ -114,7 +117,12 @@ export default function CosmeticoDetalhe() {
   if (!cosmetico)
     return (
       <div className="detalhe-bg">
-        <p className="texto-central">Cosmético não encontrado.</p>
+        <div className="detalhe-erro">
+          <p className="texto-central">Cosmético não encontrado.</p>
+          <button className="btn-voltar" onClick={() => navigate(-1)}>
+             Voltar
+          </button>
+        </div>
       </div>
     );
 
@@ -139,10 +147,9 @@ export default function CosmeticoDetalhe() {
 
           <p className="detalhe-tipo">Tipo: {cosmetico.tipo}</p>
 
-          {/* 🔹 SUBSTITUIR EMOJI POR IMAGEM */}
           <div className="detalhe-preco">
             <img src={vbucksIcon} alt="V-Bucks" className="vbucks-icone-grande" />
-            {cosmetico.preco} V-Bucks
+            <span>{cosmetico.preco} V-Bucks</span>
           </div>
 
           {icones.length > 0 && (
@@ -165,20 +172,26 @@ export default function CosmeticoDetalhe() {
           )}
 
           <div className="botoes">
-            <button
-              className={`btn-comprar ${jaAdquirido ? "btn-desabilitado" : ""}`}
-              onClick={comprarItem}
-              disabled={jaAdquirido || comprando}
-            >
-              {jaAdquirido
-                ? "Já Adquirido"
-                : comprando
-                ? "Processando..."
-                : "Comprar"}
-            </button>
+            {usuario ? (
+              <button
+                className={`btn-comprar ${jaAdquirido ? "btn-desabilitado" : ""}`}
+                onClick={comprarItem}
+                disabled={jaAdquirido || comprando}
+              >
+                {jaAdquirido
+                  ? "Já Adquirido"
+                  : comprando
+                  ? "Processando..."
+                  : "Comprar"}
+              </button>
+            ) : (
+              <button className="btn-login" onClick={() => navigate("/")}>
+                Fazer Login para Comprar
+              </button>
+            )}
 
-            <button className="btn-voltar" onClick={() => navigate("/loja")}>
-              Voltar à Loja
+            <button className="btn-voltar" onClick={() => navigate(-1)}>
+               Voltar
             </button>
           </div>
         </div>

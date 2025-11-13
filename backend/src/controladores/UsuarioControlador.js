@@ -23,8 +23,10 @@ export const listarCosmeticosDoUsuario = async (req, res) => {
       return res.status(404).json({ mensagem: "Usuário não encontrado." });
     }
 
+    // 🔹 IMPORTANTE: Mapear os campos corretamente
     const cosmeticos = usuario.cosmeticosComprados.map((item) => ({
-      id: item._id,
+      _id: item._id, // 🔹 Garantir que _id está presente
+      id: item._id,  // 🔹 Adicionar id também para compatibilidade
       nome: item.nome,
       tipo: item.tipo,
       raridade: item.raridade,
@@ -36,7 +38,7 @@ export const listarCosmeticosDoUsuario = async (req, res) => {
     res.status(200).json({
       usuario: {
         id: usuario._id,
-        nome: usuario.name,
+        nome: usuario.name, // 🔹 Retornar "nome" não "name"
         email: usuario.email,
         creditos: usuario.creditos
       },

@@ -99,19 +99,28 @@
   flex-direction: column;
   gap: 12px;
   margin-top: 30px;
+  width: 100%; /* 🔹 Garantir largura total */
 }
 
-.btn-comprar {
-  padding: 16px 32px;
-  background: linear-gradient(135deg, #ffeb3b, #ffc107);
-  color: #000;
+.btn-comprar,
+.btn-voltar,
+.btn-login {
+  /* 🔹 Estilos comuns para todos os botões */
+  width: 100%; /* 🔹 Mesma largura */
+  padding: 16px 32px; /* 🔹 Mesmo padding */
   border: none;
   border-radius: 12px;
-  font-weight: 800;
-  font-size: 1.1rem;
+  font-weight: 800; /* 🔹 Mesmo peso de fonte */
+  font-size: 1.1rem; /* 🔹 Mesmo tamanho de fonte */
   cursor: pointer;
   text-transform: uppercase;
   transition: 0.3s ease;
+  text-align: center; /* 🔹 Centralizar texto */
+}
+
+.btn-comprar {
+  background: linear-gradient(135deg, #ffeb3b, #ffc107);
+  color: #000;
   box-shadow: 0 0 20px rgba(255, 235, 59, 0.4);
 }
 
@@ -129,20 +138,27 @@
 }
 
 .btn-voltar {
-  padding: 12px 28px;
   background-color: #22223b;
   color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: 0.3s ease;
+  box-shadow: 0 0 15px rgba(34, 34, 59, 0.4);
 }
 
 .btn-voltar:hover {
   background-color: #38385e;
   transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(56, 56, 94, 0.6);
+}
+
+.btn-login {
+  background: linear-gradient(135deg, #00e0ff, #0099ff);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(0, 224, 255, 0.4);
+}
+
+.btn-login:hover {
+  background: linear-gradient(135deg, #00b7ff, #007acc);
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(0, 224, 255, 0.6);
 }
 
 /* Ícone V-Bucks grande na página de detalhes */
@@ -219,6 +235,41 @@
     transform: translateY(30px);
   }
 }
+
+/* === Estilo para erro === */
+
+.detalhe-erro {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.texto-central {
+  font-size: 1.5rem;
+  color: #ff4d4d;
+  margin-bottom: 30px;
+}
+
+.btn-login {
+  padding: 16px 32px;
+  background: linear-gradient(135deg, #00e0ff, #0099ff);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 1.1rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: 0.3s ease;
+  box-shadow: 0 0 20px rgba(0, 224, 255, 0.4);
+}
+
+.btn-login:hover {
+  background: linear-gradient(135deg, #00b7ff, #007acc);
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(0, 224, 255, 0.6);
+}
+
+
 
 
 /* === Loading === */
