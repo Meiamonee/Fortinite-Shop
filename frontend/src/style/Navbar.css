@@ -66,12 +66,6 @@
 .btn-logout {
   background-color: #ff4d4d;
   color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background 0.3s;
 }
 
 .btn-logout:hover {
@@ -120,6 +114,7 @@
 
 /* Botões */
 .btn {
+  display: inline-block;
   text-decoration: none;
   padding: 8px 15px;
   border-radius: 4px;
@@ -127,6 +122,17 @@
   font-weight: bold;
   margin-left: 10px;
   transition: background-color 0.2s, color 0.2s;
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  line-height: 1.5;
+  vertical-align: middle;
+  text-align: center;
+  min-width: 80px;
+}
+
+.btn:hover {
+  transform: none;
 }
 
 /* Ícone V-Bucks na navbar */
@@ -147,48 +153,66 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: rgba(0, 224, 255, 0.1); /* 🔹 Fundo azul claro */
+  background-color: rgba(0, 224, 255, 0.1); 
   padding: 8px 15px;
   border-radius: 20px;
-  border: 2px solid rgba(0, 224, 255, 0.4); /* 🔹 Borda azul */
+  border: 2px solid rgba(0, 224, 255, 0.4); 
   margin-right: 15px;
 }
 
 .creditos strong {
-  color: #00e0ff; /* 🔹 Texto azul claro */
+  color: #00e0ff; 
   font-size: 1.1rem;
   font-weight: 700;
   text-shadow: 0 0 10px rgba(0, 224, 255, 0.3);
 }
 
-
-
 .btn-login {
-  background-color: var(--accent-color);
-  color: var(--bg-color);
-  border: 1px solid transparent;
+  background-color: #ff4d4d;
+  color: white;
 }
 
-/* Estilo para o ícone de busca no lado direito, se for um link */
+.btn-login:hover {
+  background-color: #ff1a1a;
+}
+
+
 .navbar-right .logo-link {
   margin-right: 0;
 }
 
-/* Ajuste para o link "Entrar" que fica antes do botão "Download" */
+
 .navbar-right .btn-login {
   margin-left: 0;
   margin-right: 10px;
+  background-color: #ff4d4d !important;
+  color: white !important;
+  display: inline-block !important;
+  line-height: 1.5 !important;
+  vertical-align: middle !important;
+  padding: 8px 15px !important;
+  min-width: 80px !important;
+  border: 1px solid transparent !important;
+  border-radius: 4px !important;
+  font-size: 14px !important;
+  font-weight: bold !important;
+  box-sizing: border-box !important;
+
+}
+
+.navbar-right .btn-login:hover {
+  background-color: #ff1a1a !important;
+  transform: none !important;
+  scale: 1 !important;
 }
 
 .fortnite-icon {
   font-size: 2em;
-  /* Tamanho do ícone */
   margin-right: 5px;
-  /* Espaço entre o ícone e a imagem */
+
 }
 
 .logo-image {
-  /* Propriedades chave para controlar o tamanho da imagem: */
   height: 100%;
   width: auto;
   max-height: 40px;

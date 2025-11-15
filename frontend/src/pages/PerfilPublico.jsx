@@ -22,7 +22,6 @@ export default function PerfilPublico() {
     setLoading(true);
     try {
       const { data } = await api.get(`/usuarios/${id}/cosmeticos`);
-      console.log("📦 Dados recebidos:", data); // 🔹 Debug
       setUsuario(data.usuario);
       setCosmeticos(data.cosmeticos);
     } catch (erro) {
@@ -135,15 +134,12 @@ export default function PerfilPublico() {
         ) : (
           <>
             <div className="colecao-grid">
-              {cosmeticosPaginados.map((item) => {
-                console.log("🎮 Renderizando item:", item); // 🔹 Debug
-                return (
-                  <CosmeticoCard 
-                    key={item._id || item.id} 
-                    item={item} 
-                  />
-                );
-              })}
+              {cosmeticosPaginados.map((item) => (
+                <CosmeticoCard 
+                  key={item._id || item.id} 
+                  item={item} 
+                />
+              ))}
             </div>
 
             {totalPaginas > 1 && (

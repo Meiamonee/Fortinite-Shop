@@ -31,7 +31,7 @@ function AppContent() {
   const usuario = localStorage.getItem("usuario");
 
   // Identifica se é a página de login
-  const isLoginPage = location.pathname === "/" || location.pathname === "/login";
+  const isLoginPage = location.pathname === "/login";
 
   const videoId = "AlABOZhCCqU";
   const videoSrc = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&rel=0&modestbranding=1`;
@@ -55,36 +55,31 @@ function AppContent() {
         </div>
       )}
 
-      {/* 🔹 Esconde a Navbar na tela de login */}
-      {<Navbar />}
+      {/* 🔹 Navbar sempre visível */}
+      <Navbar />
 
       <div className={`container ${isLoginPage ? "login-active" : ""}`}>
         <Routes>
-          {/* 🔹 Login (página inicial) */}
-          <Route path="/" element={<Login />} />
+          {/* 🔹 Loja (página inicial - acessível sem login) */}
+          <Route path="/" element={<Loja />} />
 
-          {/* 🔹 Loja (só acessa se estiver logado) */}
-          <Route
-            path="/loja"
-            element={usuario ? <Loja /> : <Navigate to="/" replace />}
-          />
+          {/* 🔹 Login */}
+          <Route path="/login" element={<Login />} />
 
-          {/* 🔹 Outras páginas (também protegidas) */}
-          <Route
-            path="/cosmetico/:id"
-            element={<CosmeticoDetalhe />}
-          />
+          {/* 🔹 Detalhes do cosmético (acessível sem login) */}
+          <Route path="/cosmetico/:id" element={<CosmeticoDetalhe />} />
 
+          {/* 🔹 Páginas públicas */}
           <Route path="/usuarios" element={<UsuariosPublicos />} />
           <Route path="/usuario/:id" element={<PerfilPublico />} />
 
+          {/* 🔹 Histórico (protegido - só logados) */}
           <Route
             path="/historico"
-            element={usuario ? <Historico /> : <Navigate to="/" replace />}
+            element={usuario ? <Historico /> : <Navigate to="/login" replace />}
           />
-       
 
-          {/* 🔹 Rota inválida → redireciona para login */}
+          {/* 🔹 Rota inválida → redireciona para loja */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>

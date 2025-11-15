@@ -6,7 +6,7 @@ import AuthRotas from "./rotas/AuthRotas.js";
 import CosmeticoRotas from "./rotas/CosmeticoRotas.js";
 import CompraRotas from "./rotas/CompraRotas.js";
 import UsuarioRotas from "./rotas/UsuarioRotas.js";
-import { importarCosmeticos } from "./controladores/CosmeticoControlador.js";
+import { importarCosmeticos, sincronizarStatus } from "./controladores/CosmeticoControlador.js";
 import cron from "node-cron";
 
 dotenv.config();
@@ -47,17 +47,40 @@ const executarImportacao = async () => {
       }),
     };
     await importarCosmeticos(req, res);
-    console.log("✅ [SYNC] Sincronização finalizada com sucesso.\n");
+    console.log("✅ [SYNC] Importação de cosméticos finalizada.\n");
   } catch (erro) {
     console.error("❌ [SYNC] Erro ao sincronizar cosméticos:", erro.message);
   }
 };
 
+// Função auxiliar para sincronizar status (novo/loja)
+const executarSincronizacaoStatus = async () => {
+  try {
+    console.log("🔄 [STATUS] Iniciando sincronização de status...");
+    const req = {}; // mocks vazios
+    const res = {
+      status: () => ({
+        json: (data) => console.log("✅ [STATUS] Resultado:", data.mensagem || "Status sincronizados."),
+      }),
+    };
+    await sincronizarStatus(req, res);
+    console.log("✅ [STATUS] Sincronização de status finalizada.\n");
+  } catch (erro) {
+    console.error("❌ [STATUS] Erro ao sincronizar status:", erro.message);
+  }
+};
+
+// Função principal que executa tudo
+const executarSincronizacaoCompleta = async () => {
+  await executarImportacao();
+  await executarSincronizacaoStatus();
+};
+
 // 🔹 Executa a primeira sincronização assim que o servidor inicia
-executarImportacao();
+executarSincronizacaoCompleta();
 
 // 🔹 Executa automaticamente a cada 6 horas
 cron.schedule("0 */6 * * *", () => {
-  console.log("🕒 [CRON] Executando sincronização automática...");
-  executarImportacao();
+  console.log("🕒 [CRON] Executando sincronização automática completa...");
+  executarSincronizacaoCompleta();
 });

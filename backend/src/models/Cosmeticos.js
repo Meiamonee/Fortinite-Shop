@@ -6,7 +6,10 @@ const cosmeticoSchema = new mongoose.Schema({
   raridade: { type: String, required: true },
   preco: { type: Number, required: true },
   imagem: { type: String },
-  status: { type: String, enum: ["normal", "novo", "loja"], default: "normal" }
+  status: { type: String, enum: ["normal", "novo", "loja"], default: "normal" },
+  // 🎁 Campos para Bundles
+  isBundle: { type: Boolean, default: false },
+  bundleItems: [{ type: mongoose.Schema.Types.ObjectId, ref: "Cosmetico" }]
 }, { timestamps: true });
 
 const Cosmetico = mongoose.model("Cosmetico", cosmeticoSchema);

@@ -71,26 +71,50 @@
   margin-top: 10px;
 }
 
-.badge {
-  padding: 6px 14px;
+.detalhe-icones .badge {
+  padding: 8px 16px;
   border-radius: 8px;
-  font-weight: bold;
-  font-size: 0.85rem;
+  font-weight: 800;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.badge-novo {
-  background-color: #ffb703;
-  color: #000;
+.detalhe-icones .badge-novo {
+  background: linear-gradient(135deg, #ff6b6b, #ffb86b);
+  color: #111;
 }
 
-.badge-loja {
-  background-color: #00e0ff;
-  color: #000;
-}
-
-.badge-adquirido {
-  background-color: #4caf50;
+.detalhe-icones .badge-loja {
+  background: linear-gradient(135deg, #00d9ff, #0095ff);
   color: #fff;
+}
+
+.detalhe-icones .badge-adquirido {
+  background: linear-gradient(135deg, #4ecb71, #2d9348);
+  color: #fff;
+}
+
+.detalhe-icones .badge-bundle {
+  background: linear-gradient(135deg, #9d4edd, #c77dff);
+  color: #fff;
+}
+
+/* Info do Bundle */
+.bundle-info {
+  background: rgba(157, 78, 221, 0.1);
+  border: 2px solid rgba(157, 78, 221, 0.3);
+  border-radius: 10px;
+  padding: 15px;
+  margin: 15px 0;
+}
+
+.bundle-titulo {
+  color: #c77dff;
+  font-weight: bold;
+  font-size: 1rem;
+  margin: 0;
 }
 
 /* === Botões === */

@@ -2,7 +2,7 @@ import Usuario from "../models/Usuario.js";
 import Cosmetico from "../models/Cosmeticos.js";
 import Historico from "../models/Historico.js";
 
-// 🔹 Comprar cosmético
+// 🔹 Comprar cosmético ou bundle
 export const comprarCosmetico = async (req, res) => {
   try {
     const { usuarioId, cosmeticoId } = req.body;
@@ -12,7 +12,7 @@ export const comprarCosmetico = async (req, res) => {
     }
 
     const usuario = await Usuario.findById(usuarioId);
-    const cosmetico = await Cosmetico.findById(cosmeticoId);
+    const cosmetico = await Cosmetico.findById(cosmeticoId).populate('bundleItems');
 
     if (!usuario || !cosmetico) {
       return res.status(404).json({ mensagem: "Usuário ou cosmético não encontrado." });
@@ -29,10 +29,35 @@ export const comprarCosmetico = async (req, res) => {
       return res.status(400).json({ mensagem: "Créditos insuficientes." });
     }
 
+    // Deduzir créditos
     usuario.creditos -= cosmetico.preco;
-    usuario.cosmeticosComprados.push(cosmetico._id);
+
+    // 🎁 Se for BUNDLE, adicionar todos os itens do bundle
+    if (cosmetico.isBundle && cosmetico.bundleItems && cosmetico.bundleItems.length > 0) {
+      // Adiciona o próprio bundle
+      usuario.cosmeticosComprados.push(cosmetico._id);
+      
+      // Adiciona todos os itens do bundle
+      for (const item of cosmetico.bundleItems) {
+        const itemId = item._id || item;
+        // Verifica se já não possui o item
+        const jaTemItem = usuario.cosmeticosComprados.some(
+          (id) => id.toString() === itemId.toString()
+        );
+        if (!jaTemItem) {
+          usuario.cosmeticosComprados.push(itemId);
+        }
+      }
+
+      console.log(`🎁 Bundle comprado! ${cosmetico.bundleItems.length} itens adicionados.`);
+    } else {
+      // Item individual
+      usuario.cosmeticosComprados.push(cosmetico._id);
+    }
+
     const usuarioAtualizado = await usuario.save({ validateBeforeSave: true });
 
+    // Criar histórico
     await Historico.create({
       usuario: usuario._id,
       cosmetico: cosmetico._id,
@@ -42,7 +67,9 @@ export const comprarCosmetico = async (req, res) => {
     });
 
     res.status(200).json({
-      mensagem: "Compra realizada com sucesso!",
+      mensagem: cosmetico.isBundle 
+        ? `Bundle comprado com sucesso! ${cosmetico.bundleItems.length} itens adicionados.`
+        : "Compra realizada com sucesso!",
       creditosRestantes: usuarioAtualizado.creditos,
       cosmeticosComprados: usuarioAtualizado.cosmeticosComprados,
     });

@@ -30,23 +30,21 @@ export default function Navbar() {
   const handleLogout = () => {
     localStorage.removeItem("usuario");
     window.dispatchEvent(new Event("usuarioChange"));
-    navigate("/");
+    navigate("/"); // Redireciona para a loja (página inicial)
   };
 
   return (
     <header className="navbar-container">
       <div className="navbar-left">
-        <Link to="/loja" className="logo-link fortnite-logo">
+        <Link to="/" className="logo-link fortnite-logo">
           <img src={Logo} alt="Fortnite Shop Logo" className="logo-image" />
         </Link>
 
-        {usuario && (
-          <nav className="nav-links">
-            <Link to="/loja">Loja</Link>
-            <Link to="/usuarios">Usuários</Link>
-            <Link to="/historico">Histórico</Link>
-          </nav>
-        )}
+        <nav className="nav-links">
+          <Link to="/">Loja</Link>
+          <Link to="/usuarios">Usuários</Link>
+          {usuario && <Link to="/historico">Histórico</Link>}
+        </nav>
       </div>
 
       <div className="navbar-right">
@@ -58,7 +56,7 @@ export default function Navbar() {
         )}
 
         {!usuario ? (
-          <Link to="/" className="btn btn-login">
+          <Link to="/login" className="btn btn-login">
             Entrar
           </Link>
         ) : (

@@ -8,24 +8,9 @@ const api = axios.create({
   timeout: 10000,
 });
 
-// Interceptor para debug
-api.interceptors.request.use(
-  (config) => {
-    console.log(`🚀 ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
-    console.log("📤 Dados:", config.data);
-    return config;
-  },
-  (error) => {
-    console.error("❌ Erro na requisição:", error);
-    return Promise.reject(error);
-  }
-);
-
+// Interceptor de erro
 api.interceptors.response.use(
-  (response) => {
-    console.log(`✅ Resposta ${response.status}:`, response.data);
-    return response;
-  },
+  (response) => response,
   (error) => {
     console.error("❌ Erro na resposta:", {
       status: error.response?.status,

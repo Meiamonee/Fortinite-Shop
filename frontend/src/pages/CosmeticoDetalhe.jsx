@@ -25,8 +25,6 @@ export default function CosmeticoDetalhe() {
         const resposta = await api.get("/cosmeticos");
         const item = resposta.data.find((c) => c._id === id);
         
-        console.log("🔍 Cosmético encontrado:", item); // 🔹 DEBUG
-        
         setCosmetico(item || null);
       } catch (erro) {
         console.error("❌ Erro ao carregar cosmético:", erro);
@@ -128,9 +126,10 @@ export default function CosmeticoDetalhe() {
 
   const jaAdquirido = usuario?.cosmeticosComprados?.includes(cosmetico._id);
   const icones = [];
-  if (cosmetico.status === "novo") icones.push({ emoji: "🆕", texto: "Novo" });
-  if (cosmetico.status === "loja") icones.push({ emoji: "🛒", texto: "À venda" });
-  if (jaAdquirido) icones.push({ emoji: "✅", texto: "Adquirido" });
+  if (cosmetico.isBundle) icones.push({ texto: "Bundle" });
+  if (cosmetico.status === "novo") icones.push({ texto: "Novo" });
+  if (cosmetico.status === "loja") icones.push({ texto: "À venda" });
+  if (jaAdquirido) icones.push({ texto: "Adquirido" });
 
   return (
     <div className="detalhe-bg">
@@ -147,6 +146,12 @@ export default function CosmeticoDetalhe() {
 
           <p className="detalhe-tipo">Tipo: {cosmetico.tipo}</p>
 
+          {cosmetico.isBundle && cosmetico.bundleItems && cosmetico.bundleItems.length > 0 && (
+            <div className="bundle-info">
+              <p className="bundle-titulo">🎁 Este bundle contém {cosmetico.bundleItems.length} itens</p>
+            </div>
+          )}
+
           <div className="detalhe-preco">
             <img src={vbucksIcon} alt="V-Bucks" className="vbucks-icone-grande" />
             <span>{cosmetico.preco} V-Bucks</span>
@@ -158,7 +163,9 @@ export default function CosmeticoDetalhe() {
                 <span
                   key={i}
                   className={`badge ${
-                    icon.texto === "Novo"
+                    icon.texto === "Bundle"
+                      ? "badge-bundle"
+                      : icon.texto === "Novo"
                       ? "badge-novo"
                       : icon.texto === "À venda"
                       ? "badge-loja"
@@ -185,7 +192,7 @@ export default function CosmeticoDetalhe() {
                   : "Comprar"}
               </button>
             ) : (
-              <button className="btn-login" onClick={() => navigate("/")}>
+              <button className="btn-login" onClick={() => navigate("/login")}>
                 Fazer Login para Comprar
               </button>
             )}

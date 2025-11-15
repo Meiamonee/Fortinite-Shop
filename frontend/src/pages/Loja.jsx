@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import CosmeticoCard from "../components/CosmeticoCard";
 import Paginacao from "../components/Paginacao"; // 🔹 IMPORTAR COMPONENTE
 import "../style/Loja.css";
 
 export default function Loja() {
-  const navigate = useNavigate();
   const [cosmeticos, setCosmeticos] = useState([]);
   const [paginaAtual, setPaginaAtual] = useState(1);
   const itensPorPagina = 24;
@@ -14,19 +12,12 @@ export default function Loja() {
     nome: "",
     tipo: "",
     raridade: "",
+    status: "", // novo, loja, ou vazio (todos)
     dataInicio: "",
     dataFim: "",
   });
 
-  // 🔹 Bloqueia acesso se não estiver logado
-  useEffect(() => {
-    const user = localStorage.getItem("usuario");
-    if (!user) {
-      navigate("/", { replace: true });
-    }
-  }, [navigate]);
-
-  // 🔹 Carrega cosméticos
+  // 🔹 Carrega cosméticos (acessível sem login)
   useEffect(() => {
     async function carregarCosmeticos() {
       try {
@@ -44,12 +35,20 @@ export default function Loja() {
     const nomeMatch = item.nome.toLowerCase().includes(filtro.nome.toLowerCase());
     const tipoMatch = filtro.tipo ? item.tipo === filtro.tipo : true;
     const raridadeMatch = filtro.raridade ? item.raridade === filtro.raridade : true;
+    
+    // Status especial: bundle é identificado por isBundle, não por status
+    let statusMatch = true;
+    if (filtro.status === "bundle") {
+      statusMatch = item.isBundle === true;
+    } else if (filtro.status) {
+      statusMatch = item.status === filtro.status;
+    }
 
     const dataItem = new Date(item.createdAt);
     const inicioMatch = filtro.dataInicio ? dataItem >= new Date(filtro.dataInicio) : true;
     const fimMatch = filtro.dataFim ? dataItem <= new Date(filtro.dataFim) : true;
 
-    return nomeMatch && tipoMatch && raridadeMatch && inicioMatch && fimMatch;
+    return nomeMatch && tipoMatch && raridadeMatch && statusMatch && inicioMatch && fimMatch;
   });
 
   // 🔹 Paginação
@@ -98,6 +97,16 @@ export default function Loja() {
           <option value="rare">Raro</option>
           <option value="epic">Épico</option>
           <option value="legendary">Lendário</option>
+        </select>
+
+        <select
+          value={filtro.status}
+          onChange={(e) => setFiltro({ ...filtro, status: e.target.value })}
+          className="filtro-select"
+        >
+          <option value="">Status</option>
+          <option value="novo"> Novos</option>
+          <option value="bundle"> Bundles</option>
         </select>
 
         <div className="data-filtro">

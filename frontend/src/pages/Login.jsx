@@ -13,10 +13,8 @@ export default function Login() {
   // 🔹 Redireciona se já estiver logado
   useEffect(() => {
     const user = localStorage.getItem("usuario");
-    if (user && window.location.pathname === "/") {
-      setTimeout(() => {
-        navigate("/loja", { replace: true });
-      }, 0);
+    if (user) {
+      navigate("/", { replace: true });
     }
   }, [navigate]);
 
@@ -40,8 +38,8 @@ export default function Login() {
         // 🔹 Atualiza Navbar ou outros componentes
         window.dispatchEvent(new Event("usuarioChange"));
 
-        // 🔹 Redireciona
-        navigate("/loja", { replace: true });
+        // 🔹 Redireciona para a loja
+        navigate("/", { replace: true });
       } else {
         await api.post("/auth/registrar", { name: nome, email, senha });
         alert("Conta criada com sucesso! Faça login.");
