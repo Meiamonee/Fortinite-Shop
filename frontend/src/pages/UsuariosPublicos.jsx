@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import vbucksIcon from "../assets/v-bucks.png";
-import Paginacao from "../components/Paginacao"; // 🔹 IMPORTAR COMPONENTE
+import Paginacao from "../components/Paginacao"; 
 import "../style/UsuariosPublicos.css";
 
 export default function UsuariosPublicos() {

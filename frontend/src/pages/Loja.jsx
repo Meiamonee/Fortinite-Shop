@@ -135,10 +135,10 @@ export default function Loja() {
           className="filtro-select"
         >
           <option value="">Status</option>
-          <option value="novo">🌟 Novos</option>
-          <option value="loja">🛒 À Venda</option>
-          <option value="promocao">🔥 Em Promoção</option>
-          <option value="bundle">🎁 Bundles</option>
+          <option value="novo"> Novos</option>
+          <option value="loja"> À Venda</option>
+          <option value="promocao"> Em Promoção</option>
+          <option value="bundle"> Bundles</option>
         </select>
 
         <div className="data-filtro">
