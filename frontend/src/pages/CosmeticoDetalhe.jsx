@@ -125,10 +125,13 @@ export default function CosmeticoDetalhe() {
     );
 
   const jaAdquirido = usuario?.cosmeticosComprados?.includes(cosmetico._id);
+  const emPromocao = cosmetico.regularPrice && cosmetico.preco && cosmetico.regularPrice > cosmetico.preco;
+  
   const icones = [];
   if (cosmetico.isBundle) icones.push({ texto: "Bundle" });
   if (cosmetico.status === "novo") icones.push({ texto: "Novo" });
   if (cosmetico.status === "loja") icones.push({ texto: "À venda" });
+  if (emPromocao) icones.push({ texto: "Promoção" });
   if (jaAdquirido) icones.push({ texto: "Adquirido" });
 
   return (
@@ -154,7 +157,14 @@ export default function CosmeticoDetalhe() {
 
           <div className="detalhe-preco">
             <img src={vbucksIcon} alt="V-Bucks" className="vbucks-icone-grande" />
-            <span>{cosmetico.preco} V-Bucks</span>
+            {emPromocao ? (
+              <div className="preco-detalhes-promocao">
+                <span className="preco-riscado">{cosmetico.regularPrice} V-Bucks</span>
+                <span className="preco-final">{cosmetico.preco} V-Bucks</span>
+              </div>
+            ) : (
+              <span>{cosmetico.preco} V-Bucks</span>
+            )}
           </div>
 
           {icones.length > 0 && (
@@ -169,6 +179,8 @@ export default function CosmeticoDetalhe() {
                       ? "badge-novo"
                       : icon.texto === "À venda"
                       ? "badge-loja"
+                      : icon.texto === "Promoção"
+                      ? "badge-promocao"
                       : "badge-adquirido"
                   }`}
                 >

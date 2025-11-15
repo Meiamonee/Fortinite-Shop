@@ -77,6 +77,9 @@ export default function CosmeticoCard({ item }) {
     navigate(`/cosmetico/${itemId}`);
   };
 
+  // Verificar se está em promoção
+  const emPromocao = item.regularPrice && item.preco && item.regularPrice > item.preco;
+
   return (
     <div className={`card-cosmetico ${item.raridade || ""}`}>
       {/* 🔹 Badges Indicativos */}
@@ -84,6 +87,7 @@ export default function CosmeticoCard({ item }) {
         {item.isBundle && <div className="badge badge-bundle">BUNDLE</div>}
         {item.status === "novo" && <div className="badge badge-novo">NOVO</div>}
         {item.status === "loja" && <div className="badge badge-loja">À VENDA</div>}
+        {emPromocao && <div className="badge badge-promocao">PROMOÇÃO</div>}
         {jaAdquirido && <div className="badge badge-adquirido">ADQUIRIDO</div>}
       </div>
 
@@ -107,7 +111,14 @@ export default function CosmeticoCard({ item }) {
         <div className="card-footer">
           <div className="card-preco">
             <img src={vbucksIcon} alt="V-Bucks" className="icone-vbucks" />
-            <span className="valor">{item.preco || 0}</span>
+            {emPromocao ? (
+              <div className="preco-promocao">
+                <span className="preco-original">{item.regularPrice}</span>
+                <span className="valor preco-desconto">{item.preco || 0}</span>
+              </div>
+            ) : (
+              <span className="valor">{item.preco || 0}</span>
+            )}
           </div>
         </div>
 

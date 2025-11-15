@@ -42,32 +42,14 @@ export default function PerfilPublico() {
     }
   };
 
-  const gerarPaginasExibidas = () => {
+  // Gerar números das páginas para mostrar
+  const gerarPaginas = () => {
     const paginas = [];
-    const MAX_PAGINAS_EXIBIDAS = 5;
-    let inicio = Math.max(1, paginaAtual - Math.floor(MAX_PAGINAS_EXIBIDAS / 2));
-    let fim = Math.min(totalPaginas, inicio + MAX_PAGINAS_EXIBIDAS - 1);
-    
-    if (fim - inicio < MAX_PAGINAS_EXIBIDAS - 1) {
-      inicio = Math.max(1, fim - MAX_PAGINAS_EXIBIDAS + 1);
+    for (let i = 1; i <= totalPaginas; i++) {
+      paginas.push(i);
     }
-    
-    if (inicio > 1) {
-      paginas.push(1);
-      if (inicio > 2) paginas.push("...");
-    }
-    
-    for (let i = inicio; i <= fim; i++) paginas.push(i);
-    
-    if (fim < totalPaginas) {
-      if (fim < totalPaginas - 1) paginas.push("...");
-      paginas.push(totalPaginas);
-    }
-    
     return paginas;
   };
-
-  const paginasExibidas = gerarPaginasExibidas();
 
   if (loading) {
     return (
@@ -152,19 +134,15 @@ export default function PerfilPublico() {
                   ← Anterior
                 </button>
 
-                {paginasExibidas.map((pagina, i) =>
-                  pagina === "..." ? (
-                    <span key={`ellipsis-${i}`} className="reticencias">...</span>
-                  ) : (
-                    <button
-                      key={`page-${pagina}`}
-                      className={`btn-paginacao ${paginaAtual === pagina ? "ativo" : ""}`}
-                      onClick={() => irParaPagina(pagina)}
-                    >
-                      {pagina}
-                    </button>
-                  )
-                )}
+                {gerarPaginas().map((pagina) => (
+                  <button
+                    key={pagina}
+                    className={`btn-paginacao ${paginaAtual === pagina ? "ativo" : ""}`}
+                    onClick={() => irParaPagina(pagina)}
+                  >
+                    {pagina}
+                  </button>
+                ))}
 
                 <button
                   className="btn-paginacao"

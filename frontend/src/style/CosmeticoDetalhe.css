@@ -58,9 +58,29 @@
   color: #ffcc00;
   text-shadow: 0 0 15px rgba(255, 235, 59, 0.4);
   display: flex;
-  align-items: center; /* 🔹 Alinha verticalmente ao centro */
+  align-items: center;
   gap: 10px;
-  margin: 15px 0; /* 🔹 Adiciona espaçamento */
+  margin: 15px 0;
+}
+
+.preco-detalhes-promocao {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.preco-riscado {
+  font-size: 1.2rem;
+  color: #999;
+  text-decoration: line-through;
+  text-shadow: none;
+}
+
+.preco-final {
+  font-size: 1.8rem;
+  color: #ff3838;
+  font-weight: bold;
+  text-shadow: 0 0 15px rgba(255, 56, 56, 0.5);
 }
 
 /* === Ícones de status === */
@@ -93,6 +113,11 @@
 
 .detalhe-icones .badge-adquirido {
   background: linear-gradient(135deg, #4ecb71, #2d9348);
+  color: #fff;
+}
+
+.detalhe-icones .badge-promocao {
+  background: linear-gradient(135deg, #ff3838, #ff9500);
   color: #fff;
 }
 

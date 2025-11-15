@@ -46,6 +46,22 @@
   color: #111;
 }
 
+/* Badge "PROMOÇÃO" */
+.badge-promocao {
+  background: linear-gradient(135deg, #ff3838, #ff9500);
+  color: #fff;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
 /* Badge "À VENDA" */
 .badge-loja {
   background: linear-gradient(135deg, #00d9ff, #0095ff);
@@ -180,6 +196,31 @@
 .card-cosmetico:hover {
   transform: translateY(-8px);
   box-shadow: 0 12px 25px rgba(0, 224, 255, 0.12);
+}
+
+/* Preços em promoção */
+.preco-promocao {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.preco-original {
+  font-size: 12px;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.preco-desconto {
+  color: #ff3838 !important;
+  font-weight: bold;
+}
+
+.valor {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--cor-acento);
 }
 
 /* pequenas correções responsivas */

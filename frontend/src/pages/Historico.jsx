@@ -1,7 +1,7 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
-import Paginacao from "../components/Paginacao"; // 🔹 IMPORTAR COMPONENTE
+import Paginacao from "../components/Paginacao";
 import "../style/Historico.css";
 
 export default function Historico() {
@@ -14,63 +14,32 @@ export default function Historico() {
   const itensPorPagina = 10;
   const navigate = useNavigate();
 
-  // Memoiza o set de itens reembolsados para evitar recalcular sempre
-  const itensReembolsados = useMemo(() => {
-    const reembolsados = new Set();
-    historico.forEach(item => {
-      if (item.tipo?.toLowerCase() === "reembolso") {
-        const id = item.cosmetico?._id;
-        if (id) reembolsados.add(id);
-      }
-    });
-    return reembolsados;
-  }, [historico]);
-
-  // 🔹 Paginação
+  // Calcular paginação
   const totalPaginas = Math.ceil(historico.length / itensPorPagina);
   const indiceInicial = (paginaAtual - 1) * itensPorPagina;
   const historicoPaginado = historico.slice(indiceInicial, indiceInicial + itensPorPagina);
 
-  // 🔹 Função para mudar de página
+  // Função para mudar de página
   const handleMudarPagina = (novaPagina) => {
     setPaginaAtual(novaPagina);
   };
 
-  // Reseta para página 1 quando o histórico muda
-  useEffect(() => {
-    setPaginaAtual(1);
-  }, [historico.length]);
-
-  // Função para buscar histórico otimizada com useCallback
-  const buscarHistorico = useCallback(async (usuarioId) => {
+  // Buscar histórico do usuário
+  const buscarHistorico = async (usuarioId) => {
     setLoading(true);
     try {
-      const { data } = await api.get(`/compras/historico/${usuarioId}`);
-      setHistorico(data || []);
+      const resposta = await api.get(`/compras/historico/${usuarioId}`);
+      setHistorico(resposta.data || []);
     } catch (erro) {
-      console.error("❌ Erro ao buscar histórico:", erro.response?.data || erro.message);
+      console.error("Erro ao buscar histórico:", erro);
       setMensagem("Erro ao carregar histórico.");
       setTimeout(() => setMensagem(""), 4000);
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
-  // Atualiza usuário no localStorage
-  const atualizarUsuarioLocal = useCallback((novosDados) => {
-    const usuarioAtualizado = { ...usuario, ...novosDados };
-    localStorage.setItem("usuario", JSON.stringify(usuarioAtualizado));
-    setUsuario(usuarioAtualizado);
-    window.dispatchEvent(new Event("usuarioChange"));
-  }, [usuario]);
-
-  // Mostra mensagem temporária
-  const mostrarMensagem = useCallback((msg, tempo = 3000) => {
-    setMensagem(msg);
-    setTimeout(() => setMensagem(""), tempo);
-  }, []);
-
-  // Carrega usuário e histórico inicial
+  // Carregar dados quando a página abre
   useEffect(() => {
     const usuarioString = localStorage.getItem("usuario");
     if (!usuarioString) {
@@ -85,20 +54,21 @@ export default function Historico() {
     if (usuarioId) {
       buscarHistorico(usuarioId);
     } else {
-      console.error("❌ Usuário sem ID válido");
       setLoading(false);
     }
-  }, [navigate, buscarHistorico]);
+  }, []);
 
-  // Handler de reembolso otimizado
-  const handleReembolso = useCallback(async (cosmeticoId) => {
+  // Função para reembolsar item
+  const handleReembolso = async (cosmeticoId) => {
     if (!usuario || !cosmeticoId) {
-      mostrarMensagem("Dados inválidos para reembolso.");
+      setMensagem("Dados inválidos para reembolso.");
+      setTimeout(() => setMensagem(""), 3000);
       return;
     }
 
     const usuarioId = usuario._id || usuario.id;
     
+    // Confirmar com o usuário
     if (!window.confirm("Tem certeza que deseja solicitar o reembolso deste item?")) {
       return;
     }
@@ -106,90 +76,51 @@ export default function Historico() {
     setProcessandoReembolso(cosmeticoId);
 
     try {
-      const { data } = await api.post("/compras/reembolso", {
+      const resposta = await api.post("/compras/reembolso", {
         usuarioId,
         cosmeticoId,
       });
 
-      mostrarMensagem(data?.mensagem || "Reembolso realizado com sucesso!");
+      setMensagem(resposta.data.mensagem || "Reembolso realizado com sucesso!");
+      setTimeout(() => setMensagem(""), 3000);
 
-      // Atualiza dados do usuário
-      if (data?.creditosRestantes !== undefined) {
-        atualizarUsuarioLocal({
-          creditos: data.creditosRestantes,
-          cosmeticosComprados: data.cosmeticosComprados,
-        });
+      // Atualizar dados do usuário no localStorage
+      if (resposta.data.creditosRestantes !== undefined) {
+        const usuarioAtualizado = {
+          ...usuario,
+          creditos: resposta.data.creditosRestantes,
+          cosmeticosComprados: resposta.data.cosmeticosComprados,
+        };
+        localStorage.setItem("usuario", JSON.stringify(usuarioAtualizado));
+        setUsuario(usuarioAtualizado);
+        window.dispatchEvent(new Event("usuarioChange"));
       }
 
-      // Recarrega histórico
+      // Recarregar histórico
       await buscarHistorico(usuarioId);
       
     } catch (erro) {
-      console.error("❌ Erro ao reembolsar:", erro.response?.data || erro.message);
+      console.error("Erro ao reembolsar:", erro);
       const msg = erro.response?.data?.mensagem || "Erro ao processar o reembolso.";
-      mostrarMensagem(msg, 4000);
+      setMensagem(msg);
+      setTimeout(() => setMensagem(""), 4000);
     } finally {
       setProcessandoReembolso(null);
     }
-  }, [usuario, buscarHistorico, atualizarUsuarioLocal, mostrarMensagem]);
+  };
 
-  // Renderiza item do histórico
-  const renderHistoricoItem = useCallback((item, index) => {
-    const itemKey = item._id || item.id || `historico-${index}`;
-    const tipoTransacao = item.tipo?.toLowerCase() || "compra";
-    const cosmeticoId = item.cosmetico?._id;
-    const jaReembolsado = itensReembolsados.has(cosmeticoId);
-    const estaProcessando = processandoReembolso === cosmeticoId;
+  // Verificar se um item já foi reembolsado
+  const jaFoiReembolsado = (cosmeticoId) => {
+    // Percorre o histórico procurando reembolsos deste item
+    for (let i = 0; i < historico.length; i++) {
+      if (historico[i].tipo === "reembolso" && historico[i].cosmetico?._id === cosmeticoId) {
+        return true;
+      }
+    }
+    return false;
+  };
 
-    return (
-      <div
-        key={itemKey}
-        className={`historico-item ${tipoTransacao === "compra" ? "compra" : "reembolso"}`}
-      >
-        <div className="historico-imagem">
-          {item.cosmetico?.imagem ? (
-            <img src={item.cosmetico.imagem} alt={item.cosmetico.nome || "Cosmético"} />
-          ) : (
-            <div className="sem-imagem">📦</div>
-          )}
-        </div>
-
-        <div className="historico-info">
-          <h3>{item.cosmetico?.nome || "Item desconhecido"}</h3>
-          <p>
-            <strong>Tipo:</strong>{" "}
-            <span className={tipoTransacao === "compra" ? "badge-compra" : "badge-reembolso"}>
-              {tipoTransacao === "compra" ? "🛒 Compra" : "💰 Reembolso"}
-            </span>
-          </p>
-          <p>
-            <strong>Valor:</strong>{" "}
-            {typeof item.valor === "number" ? `${item.valor} V-Bucks` : item.valor || "—"}
-          </p>
-          <p>
-            <strong>Data:</strong> {item.data || "—"}
-          </p>
-        </div>
-
-        {/* Botão de reembolso ou badge */}
-        {tipoTransacao === "compra" && !jaReembolsado && (
-          <button
-            className="botao-reembolso"
-            onClick={() => handleReembolso(cosmeticoId)}
-            disabled={!cosmeticoId || estaProcessando}
-          >
-            {estaProcessando ? "⏳ Processando..." : "💸 Solicitar Reembolso"}
-          </button>
-        )}
-        
-        {tipoTransacao === "compra" && jaReembolsado && (
-          <div className="badge-reembolsado">✅ Já Reembolsado</div>
-        )}
-      </div>
-    );
-  }, [itensReembolsados, processandoReembolso, handleReembolso]);
-
-  // Estados de loading e erro
+  // Mostrar loading enquanto carrega
   if (loading) {
     return (
       <div className="historico-container">
@@ -201,6 +132,7 @@ export default function Historico() {
     );
   }
 
+  // Verificar se tem usuário
   if (!usuario) {
     return (
       <div className="historico-container">
@@ -218,10 +150,60 @@ export default function Historico() {
       ) : (
         <>
           <div className="historico-lista">
-            {historicoPaginado.map(renderHistoricoItem)}
+            {historicoPaginado.map((item, index) => {
+              const tipoTransacao = item.tipo?.toLowerCase() || "compra";
+              const cosmeticoId = item.cosmetico?._id;
+              const reembolsado = jaFoiReembolsado(cosmeticoId);
+              const estaProcessando = processandoReembolso === cosmeticoId;
+
+              return (
+                <div
+                  key={item._id || `historico-${index}`}
+                  className={`historico-item ${tipoTransacao === "compra" ? "compra" : "reembolso"}`}
+                >
+                  <div className="historico-imagem">
+                    {item.cosmetico?.imagem ? (
+                      <img src={item.cosmetico.imagem} alt={item.cosmetico.nome || "Cosmético"} />
+                    ) : (
+                      <div className="sem-imagem">📦</div>
+                    )}
+                  </div>
+
+                  <div className="historico-info">
+                    <h3>{item.cosmetico?.nome || "Item desconhecido"}</h3>
+                    <p>
+                      <strong>Tipo:</strong>{" "}
+                      <span className={tipoTransacao === "compra" ? "badge-compra" : "badge-reembolso"}>
+                        {tipoTransacao === "compra" ? "🛒 Compra" : "💰 Reembolso"}
+                      </span>
+                    </p>
+                    <p>
+                      <strong>Valor:</strong> {item.valor} V-Bucks
+                    </p>
+                    <p>
+                      <strong>Data:</strong> {item.data}
+                    </p>
+                  </div>
+
+                  {/* Mostrar botão de reembolso apenas para compras que não foram reembolsadas */}
+                  {tipoTransacao === "compra" && !reembolsado && (
+                    <button
+                      className="botao-reembolso"
+                      onClick={() => handleReembolso(cosmeticoId)}
+                      disabled={estaProcessando}
+                    >
+                      {estaProcessando ? "⏳ Processando..." : "💸 Solicitar Reembolso"}
+                    </button>
+                  )}
+                  
+                  {tipoTransacao === "compra" && reembolsado && (
+                    <div className="badge-reembolsado">✅ Já Reembolsado</div>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
-       
           <Paginacao
             paginaAtual={paginaAtual}
             totalPaginas={totalPaginas}

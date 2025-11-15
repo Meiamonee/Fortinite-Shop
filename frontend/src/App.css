@@ -5,9 +5,7 @@
   width: 100vw; 
   height: 100vh;
   overflow: hidden;
-
-  /* Antes: z-index: -10; */
-  z-index: 0; /* vídeo no fundo, mas acima do background do body */
+  z-index: 0;
 }
 
 /* iframe */
@@ -19,7 +17,7 @@
   height: 100%;
   pointer-events: none;
   object-fit: cover;
-  z-index: 0; /* mantém o vídeo no mesmo nível do container */
+  z-index: 0; 
 }
 
 /* overlay gradiente */
@@ -27,7 +25,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 1; /* acima do vídeo, mas abaixo do conteúdo */
+  z-index: 1; 
   background: linear-gradient(
     to right,
     rgba(0,0,0,0.8) 0%,
@@ -39,6 +37,6 @@
 /* conteúdo */
 .container {
   position: relative;
-  z-index: 2; /* acima do overlay e do vídeo */
+  z-index: 2; 
   padding-top: 60px;
 }

@@ -1,15 +1,14 @@
 import axios from "axios";
 import Cosmetico from "../models/Cosmeticos.js";
 
-/* ===========================================
-   🔹 LISTAR COSMÉTICOS (Todos ou com filtros)
-   =========================================== */
+// Listar todos os cosméticos
 export const listarCosmeticos = async (req, res) => {
   try {
+    // Buscar todos os cosméticos do banco de dados
     const cosmeticos = await Cosmetico.find().sort({ createdAt: -1 });
     res.status(200).json(cosmeticos);
   } catch (erro) {
-    console.error("❌ Erro ao listar cosméticos:", erro.message);
+    console.error("Erro ao listar cosméticos:", erro.message);
     res.status(500).json({ mensagem: "Erro ao listar cosméticos." });
   }
 };
@@ -120,7 +119,7 @@ export const sincronizarStatus = async (req, res) => {
       console.log(`📦 Entradas com campo 'bundle': ${entriesComBundle.length}`);
 
       for (const entry of entries) {
-        const items = entry.items || [];
+        const items = entry.brItems || entry.items || [];
         
         // 🎁 Se tem bundle, processar como bundle (relaxado: mesmo com 1 item)
         if (entry.bundle && items.length > 0) {
@@ -161,17 +160,21 @@ export const sincronizarStatus = async (req, res) => {
                   status: "loja",
                   isBundle: true,
                   bundleItems: itemIds,
-                  imagem: imagemBundle || bundleExistente.imagem
+                  imagem: imagemBundle || bundleExistente.imagem,
+                  preco: entry.finalPrice || bundleExistente.preco,
+                  regularPrice: entry.regularPrice || entry.finalPrice
                 }
               );
             } else {
               // Criar novo bundle
-              const precoTotal = items.reduce((sum, item) => sum + (item.price?.finalPrice || 0), 0);
+              const precoFinal = entry.finalPrice || Math.floor(Math.random() * 3000) + 1000;
+              const precoRegular = entry.regularPrice || precoFinal;
               await Cosmetico.create({
                 nome: nomeBundle,
                 tipo: "bundle",
                 raridade: items[0]?.rarity?.value || "rare",
-                preco: precoTotal || Math.floor(Math.random() * 3000) + 1000,
+                preco: precoFinal,
+                regularPrice: precoRegular,
                 imagem: imagemBundle,
                 status: "loja",
                 isBundle: true,
@@ -188,9 +191,27 @@ export const sincronizarStatus = async (req, res) => {
             const nome = item.name || item.displayName || item.devName;
             
             if (nome) {
+              // Atualizar com preços da API
+              const updateData = {
+                status: "loja",
+                preco: entry.finalPrice || undefined,
+                regularPrice: entry.regularPrice || entry.finalPrice || undefined
+              };
+              
+              // Remover campos undefined
+              Object.keys(updateData).forEach(key => 
+                updateData[key] === undefined && delete updateData[key]
+              );
+              
+              // Log para debug
+              if (entry.regularPrice && entry.finalPrice && entry.regularPrice > entry.finalPrice) {
+                console.log(`🔥 PROMOÇÃO ENCONTRADA: ${nome}`);
+                console.log(`   Preço Regular: ${entry.regularPrice}, Preço Final: ${entry.finalPrice}`);
+              }
+              
               const resultado = await Cosmetico.updateOne(
                 { nome: { $regex: new RegExp(`^${nome}$`, 'i') } },
-                { status: "loja" }
+                updateData
               );
               if (resultado.modifiedCount > 0) {
                 lojaCount++;
@@ -200,6 +221,14 @@ export const sincronizarStatus = async (req, res) => {
         }
       }
       console.log(`✅ ${lojaCount} cosméticos marcados como "loja" (${bundlesCount} bundles)`);
+      
+      // Verificar quantos itens em promoção temos
+      const emPromocao = await Cosmetico.countDocuments({
+        regularPrice: { $exists: true, $ne: null },
+        preco: { $exists: true, $ne: null },
+        $expr: { $gt: ["$regularPrice", "$preco"] }
+      });
+      console.log(`🔥 Total de itens em PROMOÇÃO: ${emPromocao}`);
     } catch (erro) {
       console.error("⚠️ Erro ao buscar shop:", erro.message);
     }
@@ -260,5 +289,93 @@ export const filtrarCosmeticos = async (req, res) => {
   } catch (erro) {
     console.error("❌ Erro ao filtrar cosméticos:", erro.message);
     res.status(500).json({ mensagem: "Erro ao aplicar filtros." });
+  }
+};
+
+// Listar apenas cosméticos à venda
+export const listarShop = async (req, res) => {
+  try {
+    // Buscar apenas os que estão na loja
+    const cosmeticosNaLoja = await Cosmetico.find({ status: "loja" }).sort({ createdAt: -1 });
+    res.status(200).json({
+      total: cosmeticosNaLoja.length,
+      cosmeticos: cosmeticosNaLoja,
+    });
+  } catch (erro) {
+    console.error("Erro ao listar shop:", erro.message);
+    res.status(500).json({ mensagem: "Erro ao listar shop." });
+  }
+};
+
+// Listar apenas cosméticos novos
+export const listarNovos = async (req, res) => {
+  try {
+    // Buscar apenas os que são novos
+    const cosmeticosNovos = await Cosmetico.find({ status: "novo" }).sort({ createdAt: -1 });
+    res.status(200).json({
+      total: cosmeticosNovos.length,
+      cosmeticos: cosmeticosNovos,
+    });
+  } catch (erro) {
+    console.error("Erro ao listar novos:", erro.message);
+    res.status(500).json({ mensagem: "Erro ao listar novos." });
+  }
+};
+
+// Endpoint de teste para criar itens em promoção
+export const criarItensPromocaoTeste = async (req, res) => {
+  try {
+    console.log("🧪 Criando itens de teste em promoção...");
+    
+    // Criar alguns itens de teste com promoção
+    const itensTeste = [
+      {
+        nome: "TESTE - Skin Épica em Promoção",
+        tipo: "outfit",
+        raridade: "epic",
+        preco: 1200,
+        regularPrice: 1600,
+        imagem: "https://via.placeholder.com/150",
+        status: "loja"
+      },
+      {
+        nome: "TESTE - Picareta Rara 50% OFF",
+        tipo: "pickaxe",
+        raridade: "rare",
+        preco: 500,
+        regularPrice: 1000,
+        imagem: "https://via.placeholder.com/150",
+        status: "loja"
+      },
+      {
+        nome: "TESTE - Bundle Lendário Desconto",
+        tipo: "bundle",
+        raridade: "legendary",
+        preco: 2000,
+        regularPrice: 2800,
+        imagem: "https://via.placeholder.com/150",
+        status: "loja",
+        isBundle: true
+      }
+    ];
+
+    let criados = 0;
+    for (const item of itensTeste) {
+      // Verificar se já existe
+      const existe = await Cosmetico.findOne({ nome: item.nome });
+      if (!existe) {
+        await Cosmetico.create(item);
+        criados++;
+      }
+    }
+
+    console.log(`✅ ${criados} itens de teste criados`);
+    res.status(200).json({ 
+      mensagem: `${criados} itens de teste em promoção criados com sucesso!`,
+      itensCriados: criados
+    });
+  } catch (erro) {
+    console.error("Erro ao criar itens de teste:", erro.message);
+    res.status(500).json({ mensagem: "Erro ao criar itens de teste." });
   }
 };

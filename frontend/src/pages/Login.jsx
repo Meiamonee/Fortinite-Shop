@@ -10,13 +10,13 @@ export default function Login() {
   const [senha, setSenha] = useState("");
   const navigate = useNavigate();
 
-  // 🔹 Redireciona se já estiver logado
+  // Redireciona se já estiver logado
   useEffect(() => {
     const user = localStorage.getItem("usuario");
     if (user) {
-      navigate("/", { replace: true });
+      navigate("/");
     }
-  }, [navigate]);
+  }, []);
 
   const alternarModo = () => {
     setModo(modo === "login" ? "registrar" : "login");
@@ -30,27 +30,30 @@ export default function Login() {
 
     try {
       if (modo === "login") {
+        // Fazer login
         const resposta = await api.post("/auth/login", { email, senha });
 
-        // 🔹 Salva usuário no localStorage
+        // Salvar usuário no localStorage
         localStorage.setItem("usuario", JSON.stringify(resposta.data.usuario));
 
-        // 🔹 Atualiza Navbar ou outros componentes
+        // Atualizar Navbar
         window.dispatchEvent(new Event("usuarioChange"));
 
-        // 🔹 Redireciona para a loja
-        navigate("/", { replace: true });
+        // Ir para a loja
+        navigate("/");
       } else {
+        // Registrar novo usuário
         await api.post("/auth/registrar", { name: nome, email, senha });
         alert("Conta criada com sucesso! Faça login.");
         setModo("login");
       }
     } catch (erro) {
-      alert(
-        modo === "login"
-          ? "Erro ao fazer login. Verifique suas credenciais."
-          : "Erro ao registrar. Tente novamente."
-      );
+      // Mostrar erro para o usuário
+      if (modo === "login") {
+        alert("Erro ao fazer login. Verifique suas credenciais.");
+      } else {
+        alert("Erro ao registrar. Tente novamente.");
+      }
     }
   };
 

@@ -55,7 +55,7 @@ function AppContent() {
         </div>
       )}
 
-      {/* 🔹 Navbar sempre visível */}
+
       <Navbar />
 
       <div className={`container ${isLoginPage ? "login-active" : ""}`}>
@@ -66,14 +66,14 @@ function AppContent() {
           {/* 🔹 Login */}
           <Route path="/login" element={<Login />} />
 
-          {/* 🔹 Detalhes do cosmético (acessível sem login) */}
+          {/* 🔹 Detalhes do cosmético */}
           <Route path="/cosmetico/:id" element={<CosmeticoDetalhe />} />
 
           {/* 🔹 Páginas públicas */}
           <Route path="/usuarios" element={<UsuariosPublicos />} />
           <Route path="/usuario/:id" element={<PerfilPublico />} />
 
-          {/* 🔹 Histórico (protegido - só logados) */}
+          {/* 🔹 Histórico */}
           <Route
             path="/historico"
             element={usuario ? <Historico /> : <Navigate to="/login" replace />}
