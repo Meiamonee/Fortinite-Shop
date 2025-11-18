@@ -195,7 +195,7 @@ Fortinite-Shop/
 
 ## 🎯 Decisões Técnicas
 
-> Muitas decisões abaixo foram tomadas em função dos requisitos do desafio (frontend + backend, integração com a API externa não oficial do Fortnite, sincronização periódica dos endpoints `/cosmetics/new` e `/shop`, entrega em Docker e avaliação do código).
+> Muitas decisões abaixo foram tomadas em função dos requisitos do desafio (frontend + backend, integração com a API externa, sincronização periódica dos endpoints `/cosmetics/new` e `/shop`).
 
 ### 1. **Arquitetura com Separação Frontend/Backend**
 - **Decisão:** Frontend e backend em pastas separadas dentro do mesmo repositório.
