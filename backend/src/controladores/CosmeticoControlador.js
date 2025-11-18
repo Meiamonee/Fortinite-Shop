@@ -33,20 +33,33 @@ export const listarCosmeticos = async (req, res) => {
     if (nome) filtro.nome = { $regex: nome, $options: "i" };
     if (tipo) filtro.tipo = tipo;
     if (raridade) filtro.raridade = raridade;
-    if (status) filtro.status = status;
     
+    // Filtro de status (novo, loja) ou bundle
+    if (status === "bundle") {
+      filtro.isBundle = true;
+    } else if (status) {
+      filtro.status = status;
+    }
+    
+    // Filtro de promoção
     if (promocao === "true") {
       filtro.regularPrice = { $exists: true, $ne: null };
       filtro.preco = { $exists: true, $ne: null };
       filtro.$expr = { $gt: ["$regularPrice", "$preco"] };
     }
     
+    console.log("Filtros aplicados:", JSON.stringify(filtro));
+    
     const total = await Cosmetico.countDocuments(filtro);
+    console.log(`Total de cosméticos encontrados: ${total}`);
+    
     const cosmeticos = await Cosmetico.find(filtro)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit))
       .select('nome tipo raridade preco regularPrice imagem status isBundle bundleItems createdAt');
+    
+    console.log(`Retornando ${cosmeticos.length} cosméticos da página ${page}`);
     
     res.status(200).json({
       cosmeticos,
@@ -57,6 +70,7 @@ export const listarCosmeticos = async (req, res) => {
     });
   } catch (erro) {
     console.error("Erro ao listar cosméticos:", erro.message);
+    console.error("Stack:", erro.stack);
     res.status(500).json({ mensagem: "Erro ao listar cosméticos." });
   }
 };

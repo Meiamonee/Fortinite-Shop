@@ -37,12 +37,16 @@ export default function Loja() {
         if (filtro.status) params.append('status', filtro.status);
         if (filtro.promocao === "true") params.append('promocao', 'true');
         
+        console.log("Carregando cosméticos com filtros:", Object.fromEntries(params));
+        
         const resposta = await api.get(`/cosmeticos?${params.toString()}`);
         
         if (resposta.data.cosmeticos) {
           setCosmeticos(resposta.data.cosmeticos);
           setTotalPaginas(resposta.data.totalPaginas || 1);
           setTotal(resposta.data.total || 0);
+          
+          console.log(`Cosméticos carregados: ${resposta.data.cosmeticos.length} de ${resposta.data.total} total`);
           
           const emPromocao = resposta.data.cosmeticos.filter(item => 
             item.regularPrice && item.preco && item.regularPrice > item.preco
@@ -73,10 +77,8 @@ export default function Loja() {
     return inicioMatch && fimMatch;
   });
 
-  // Filtro especial para bundles (client-side)
-  const cosmeticosFinais = filtro.status === "bundle" 
-    ? cosmeticosFiltrados.filter(item => item.isBundle === true)
-    : cosmeticosFiltrados;
+  // Não precisa mais filtrar bundles client-side, o backend já faz isso
+  const cosmeticosFinais = cosmeticosFiltrados;
 
   const handleMudarPagina = (novaPagina) => {
     setPaginaAtual(novaPagina);
@@ -167,7 +169,7 @@ export default function Loja() {
       ) : (
         <>
           <div className="info-resultados">
-            <p>Total: {filtro.status === "bundle" ? cosmeticosFinais.length : total} cosméticos</p>
+            <p>Total: {total} cosméticos</p>
           </div>
           
           <div className="grid-cosmeticos">
@@ -179,13 +181,11 @@ export default function Loja() {
             )}
           </div>
 
-          {filtro.status !== "bundle" && (
-            <Paginacao
-              paginaAtual={paginaAtual}
-              totalPaginas={totalPaginas}
-              onMudarPagina={handleMudarPagina}
-            />
-          )}
+          <Paginacao
+            paginaAtual={paginaAtual}
+            totalPaginas={totalPaginas}
+            onMudarPagina={handleMudarPagina}
+          />
         </>
       )}
     </div>
