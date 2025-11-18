@@ -12,7 +12,7 @@ const api = axios.create({
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error("❌ Erro na resposta:", {
+    console.error("Erro na resposta:", {
       status: error.response?.status,
       data: error.response?.data,
       message: error.message,
