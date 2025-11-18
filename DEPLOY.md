@@ -177,3 +177,29 @@ Isso significa que a variável `MONGO_URI` não está sendo lida. Siga estes pas
 - Verifique se o backend está rodando (acesse a URL do Render no navegador)
 - Verifique o console do navegador para erros
 
+### Banco de dados vazio (sem cosméticos)
+
+Se o site não mostra cosméticos ou mostra 0 itens:
+
+1. **Verifique os logs do Render:**
+   - Procure por: "Total de itens recebidos da API"
+   - Se aparecer 0, a API da Fortnite pode estar bloqueando requisições
+
+2. **Importe cosméticos manualmente:**
+   - Acesse: `https://seu-backend.onrender.com/cosmeticos/importar`
+   - Isso vai importar todos os cosméticos da API
+   - Aguarde alguns minutos (pode demorar)
+
+3. **Sincronize status (novo/loja):**
+   - Acesse: `https://seu-backend.onrender.com/cosmeticos/sincronizar`
+   - Isso marca quais cosméticos são novos ou estão à venda
+
+4. **Verifique se há cosméticos no banco:**
+   - Acesse: `https://seu-backend.onrender.com/cosmeticos`
+   - Deve retornar um array com os cosméticos
+
+5. **Se a API da Fortnite estiver bloqueando:**
+   - A sincronização automática pode falhar silenciosamente
+   - Tente importar manualmente pelos endpoints acima
+   - A sincronização automática roda a cada 6 horas, então pode demorar
+

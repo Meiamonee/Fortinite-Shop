@@ -14,40 +14,82 @@ export const listarCosmeticos = async (req, res) => {
 // Importa cosméticos da API Fortnite
 export const importarCosmeticos = async (req, res) => {
   try {
+    console.log("Iniciando importação de cosméticos da API Fortnite...");
+    
     const resposta = await axios.get("https://fortnite-api.com/v2/cosmetics/br", {
       headers: { "User-Agent": "Mozilla/5.0" },
+      timeout: 30000,
     });
 
     const itens = resposta.data?.data || [];
+    console.log(`Total de itens recebidos da API: ${itens.length}`);
+    
+    if (itens.length === 0) {
+      console.warn("Nenhum item recebido da API!");
+      return res.status(400).json({ 
+        mensagem: "Nenhum cosmético recebido da API Fortnite.",
+        total: 0
+      });
+    }
+
     let novos = 0;
+    let existentes = 0;
+    let erros = 0;
 
     for (const item of itens) {
-      const nome = item.name || item.displayName || "Sem nome";
-      const tipo = item.type?.value || item.type || "desconhecido";
-      const raridade = item.rarity?.value || "comum";
-      const imagem = item.images?.icon || null;
+      try {
+        const nome = item.name || item.displayName || "Sem nome";
+        const tipo = item.type?.value || item.type || "desconhecido";
+        const raridade = item.rarity?.value || "comum";
+        const imagem = item.images?.icon || null;
 
-      // Evita duplicação
-      const existente = await Cosmetico.findOne({ nome });
-      if (!existente) {
-        await Cosmetico.create({
-          nome,
-          tipo,
-          raridade,
-          preco: Math.floor(Math.random() * 5000) + 500,
-          imagem,
-          status: "normal",
-        });
-        novos++;
+        // Evita duplicação
+        const existente = await Cosmetico.findOne({ nome });
+        if (!existente) {
+          await Cosmetico.create({
+            nome,
+            tipo,
+            raridade,
+            preco: Math.floor(Math.random() * 5000) + 500,
+            imagem,
+            status: "normal",
+          });
+          novos++;
+        } else {
+          existentes++;
+        }
+      } catch (itemErro) {
+        erros++;
+        console.error(`Erro ao processar item:`, itemErro.message);
       }
     }
 
-    res.status(201).json({
-      mensagem: `Importação concluída. ${novos} novos cosméticos adicionados.`,
-    });
+    console.log(`Importação concluída: ${novos} novos, ${existentes} já existentes, ${erros} erros`);
+
+    const mensagem = `Importação concluída. ${novos} novos cosméticos adicionados.`;
+    
+    if (res && res.status) {
+      res.status(201).json({
+        mensagem,
+        novos,
+        existentes,
+        erros,
+        total: itens.length
+      });
+    } else {
+      console.log(mensagem);
+    }
   } catch (erro) {
-    console.error("Erro ao importar cosméticos:", erro.message);
-    res.status(500).json({ mensagem: "Erro ao importar cosméticos." });
+    const mensagemErro = `Erro ao importar cosméticos: ${erro.message}`;
+    console.error(mensagemErro);
+    console.error("Stack:", erro.stack);
+    
+    if (res && res.status) {
+      res.status(500).json({ 
+        mensagem: "Erro ao importar cosméticos.",
+        erro: erro.message 
+      });
+    }
   }
 };
 
@@ -169,15 +211,21 @@ export const sincronizarStatus = async (req, res) => {
             if (nome) {
               // Atualiza com preços da API
               const updateData = {
-                status: "loja",
-                preco: entry.finalPrice || undefined,
-                regularPrice: entry.regularPrice || entry.finalPrice || undefined
+                status: "loja"
               };
               
-              // Remove campos undefined
-              Object.keys(updateData).forEach(key => 
-                updateData[key] === undefined && delete updateData[key]
-              );
+              // Só atualiza preço se a API fornecer
+              if (entry.finalPrice) {
+                updateData.preco = entry.finalPrice;
+              }
+              
+              // Só adiciona regularPrice se for diferente do preço final (promoção)
+              if (entry.regularPrice && entry.finalPrice && entry.regularPrice > entry.finalPrice) {
+                updateData.regularPrice = entry.regularPrice;
+                console.log(`Promoção detectada: ${nome} - Regular: ${entry.regularPrice}, Final: ${entry.finalPrice}`);
+              } else if (entry.regularPrice) {
+                updateData.regularPrice = entry.regularPrice;
+              }
               
               const resultado = await Cosmetico.updateOne(
                 { nome: { $regex: new RegExp(`^${nome}$`, 'i') } },
@@ -224,7 +272,12 @@ export const filtrarCosmeticos = async (req, res) => {
 
     if (novos === "true") filtro.status = "novo";
     if (loja === "true") filtro.status = "loja";
-    if (promocao === "true") filtro.desconto = { $exists: true, $gt: 0 };
+    if (promocao === "true") {
+      // Promoção: regularPrice > preco
+      filtro.regularPrice = { $exists: true, $ne: null };
+      filtro.preco = { $exists: true, $ne: null };
+      filtro.$expr = { $gt: ["$regularPrice", "$preco"] };
+    }
 
     const cosmeticos = await Cosmetico.find(filtro).sort({ createdAt: -1 });
 

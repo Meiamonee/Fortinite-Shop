@@ -66,29 +66,39 @@ app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
 // Sincronização automática com API Fortnite
 const executarImportacao = async () => {
   try {
+    console.log("Executando importação de cosméticos...");
     const req = {};
     const res = {
       status: () => ({
-        json: () => {},
+        json: (data) => {
+          console.log("Resultado da importação:", data);
+        },
       }),
     };
     await importarCosmeticos(req, res);
+    console.log("Importação de cosméticos finalizada.");
   } catch (erro) {
     console.error("Erro ao sincronizar cosméticos:", erro.message);
+    console.error("Stack:", erro.stack);
   }
 };
 
 const executarSincronizacaoStatus = async () => {
   try {
+    console.log("Executando sincronização de status...");
     const req = {};
     const res = {
       status: () => ({
-        json: () => {},
+        json: (data) => {
+          console.log("Resultado da sincronização de status:", data);
+        },
       }),
     };
     await sincronizarStatus(req, res);
+    console.log("Sincronização de status finalizada.");
   } catch (erro) {
     console.error("Erro ao sincronizar status:", erro.message);
+    console.error("Stack:", erro.stack);
   }
 };
 
