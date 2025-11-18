@@ -24,7 +24,7 @@ const usuarioSchema = new mongoose.Schema({
   cosmeticosComprados: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Cosmetico"   // ✅ ref deve estar dentro do array de objetos
+      ref: "Cosmetico"
     }
   ]
 }, { timestamps: true });

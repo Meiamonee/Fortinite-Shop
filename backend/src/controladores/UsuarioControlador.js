@@ -1,7 +1,6 @@
 import Usuario from "../models/Usuario.js";
 import Cosmetico from "../models/Cosmeticos.js";
 
-// 🔹 Listar todos os usuários
 export const listarUsuarios = async (req, res) => {
   try {
     const usuarios = await Usuario.find({}, "name email creditos cosmeticosComprados");
@@ -12,7 +11,6 @@ export const listarUsuarios = async (req, res) => {
   }
 };
 
-// 🔹 Listar cosméticos comprados por um usuário
 export const listarCosmeticosDoUsuario = async (req, res) => {
   try {
     const usuarioId = req.params.id.trim();
@@ -23,10 +21,10 @@ export const listarCosmeticosDoUsuario = async (req, res) => {
       return res.status(404).json({ mensagem: "Usuário não encontrado." });
     }
 
-    // 🔹 IMPORTANTE: Mapear os campos corretamente
+    // Mapeia os campos corretamente
     const cosmeticos = usuario.cosmeticosComprados.map((item) => ({
-      _id: item._id, // 🔹 Garantir que _id está presente
-      id: item._id,  // 🔹 Adicionar id também para compatibilidade
+      _id: item._id,
+      id: item._id,
       nome: item.nome,
       tipo: item.tipo,
       raridade: item.raridade,
@@ -38,7 +36,7 @@ export const listarCosmeticosDoUsuario = async (req, res) => {
     res.status(200).json({
       usuario: {
         id: usuario._id,
-        nome: usuario.name, // 🔹 Retornar "nome" não "name"
+        nome: usuario.name, // Retorna "nome" não "name"
         email: usuario.email,
         creditos: usuario.creditos
       },
@@ -50,7 +48,6 @@ export const listarCosmeticosDoUsuario = async (req, res) => {
   }
 };
 
-// 🔹 Listar usuários públicos com paginação
 export const listarUsuariosPublicos = async (req, res) => {
   try {
     const { page = 1, limit = 12 } = req.query;

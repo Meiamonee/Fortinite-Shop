@@ -1,17 +1,15 @@
 import Usuario from "../models/Usuario.js";
 
-// CADASTRAR novo usuário
 export const cadastrarUsuario = async (req, res) => {
   try {
     const { name, email, senha } = req.body;
 
-    // Verifica se já existe um usuário com esse e-mail
+    // Verifica se já existe usuário com esse e-mail
     const usuarioExistente = await Usuario.findOne({ email });
     if (usuarioExistente) {
       return res.status(400).json({ mensagem: "E-mail já cadastrado!" });
     }
 
-    // Cria e salva o novo usuário
     const novoUsuario = new Usuario({ name, email, senha });
     await novoUsuario.save();
 
@@ -30,24 +28,22 @@ export const cadastrarUsuario = async (req, res) => {
   }
 };
 
-// LOGIN do usuário
 export const loginUsuario = async (req, res) => {
   try {
     const { email, senha } = req.body;
 
-    // Procura o usuário pelo e-mail
+    // Busca usuário pelo e-mail
     const usuario = await Usuario.findOne({ email });
 
     if (!usuario) {
       return res.status(404).json({ mensagem: "Usuário não encontrado!" });
     }
 
-    // Confere se a senha confere
+    // Verifica senha
     if (usuario.senha !== senha) {
       return res.status(401).json({ mensagem: "Senha incorreta!" });
     }
 
-    // Login bem-sucedido
     res.status(200).json({
       mensagem: "Login realizado com sucesso!",
       usuario: {

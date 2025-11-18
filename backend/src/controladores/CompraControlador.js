@@ -2,17 +2,14 @@ import Usuario from "../models/Usuario.js";
 import Cosmetico from "../models/Cosmeticos.js";
 import Historico from "../models/Historico.js";
 
-// Comprar cosmético ou bundle
 export const comprarCosmetico = async (req, res) => {
   try {
     const { usuarioId, cosmeticoId } = req.body;
 
-    // Verificar se os dados foram enviados
     if (!usuarioId || !cosmeticoId) {
       return res.status(400).json({ mensagem: "Campos obrigatórios ausentes." });
     }
 
-    // Buscar usuário e cosmético no banco
     const usuario = await Usuario.findById(usuarioId);
     const cosmetico = await Cosmetico.findById(cosmeticoId).populate('bundleItems');
 
@@ -20,7 +17,6 @@ export const comprarCosmetico = async (req, res) => {
       return res.status(404).json({ mensagem: "Usuário ou cosmético não encontrado." });
     }
 
-    // Verificar se o usuário já tem este item
     const jaComprado = usuario.cosmeticosComprados.some(
       (id) => id.toString() === cosmetico._id.toString()
     );
@@ -28,23 +24,20 @@ export const comprarCosmetico = async (req, res) => {
       return res.status(400).json({ mensagem: "Este cosmético já foi comprado." });
     }
 
-    // Verificar se tem créditos suficientes
     if (usuario.creditos < cosmetico.preco) {
       return res.status(400).json({ mensagem: "Créditos insuficientes." });
     }
 
-    // Tirar os créditos do usuário
     usuario.creditos -= cosmetico.preco;
 
-    // Se for bundle, adicionar o bundle e todos os itens
+    // Se for bundle, adiciona o bundle e todos os itens
     if (cosmetico.isBundle && cosmetico.bundleItems && cosmetico.bundleItems.length > 0) {
-      // Adiciona o bundle
       usuario.cosmeticosComprados.push(cosmetico._id);
       
       // Adiciona cada item do bundle
       for (const item of cosmetico.bundleItems) {
         const itemId = item._id || item;
-        // Verificar se já não possui
+        // Verifica se já não possui
         const jaTemItem = usuario.cosmeticosComprados.some(
           (id) => id.toString() === itemId.toString()
         );
@@ -52,17 +45,14 @@ export const comprarCosmetico = async (req, res) => {
           usuario.cosmeticosComprados.push(itemId);
         }
       }
-
-      console.log("Bundle comprado! Itens adicionados:", cosmetico.bundleItems.length);
     } else {
       // Item normal (não é bundle)
       usuario.cosmeticosComprados.push(cosmetico._id);
     }
 
-    // Salvar no banco de dados
     const usuarioAtualizado = await usuario.save({ validateBeforeSave: true });
 
-    // Registrar no histórico
+    // Registra no histórico
     await Historico.create({
       usuario: usuario._id,
       cosmetico: cosmetico._id,
@@ -79,12 +69,11 @@ export const comprarCosmetico = async (req, res) => {
       cosmeticosComprados: usuarioAtualizado.cosmeticosComprados,
     });
   } catch (erro) {
-    console.error("❌ Erro ao comprar cosmético:", erro);
+    console.error("Erro ao comprar cosmético:", erro);
     res.status(500).json({ mensagem: "Erro ao processar compra." });
   }
 };
 
-// 🔹 Listar histórico de um usuário (formato legível)
 export const listarHistorico = async (req, res) => {
   try {
     const { usuarioId } = req.params;
@@ -125,12 +114,11 @@ export const listarHistorico = async (req, res) => {
 
     res.status(200).json(historicoFormatado);
   } catch (erro) {
-    console.error("❌ Erro ao listar histórico:", erro.message);
+    console.error("Erro ao listar histórico:", erro.message);
     res.status(500).json({ mensagem: "Erro ao listar histórico." });
   }
 };
 
-// 🔹 Reembolsar um cosmético ou bundle
 export const reembolsarCosmetico = async (req, res) => {
   try {
     const { usuarioId, cosmeticoId } = req.body;
@@ -146,7 +134,6 @@ export const reembolsarCosmetico = async (req, res) => {
       return res.status(404).json({ mensagem: "Usuário ou cosmético não encontrado." });
     }
 
-    // Verifica se o usuário possui o item
     const possui = usuario.cosmeticosComprados.some(
       (id) => id.toString() === cosmetico._id.toString()
     );
@@ -159,11 +146,9 @@ export const reembolsarCosmetico = async (req, res) => {
       (id) => id.toString() !== cosmetico._id.toString()
     );
 
-    // 🎁 Se for BUNDLE, remover também todos os itens individuais
+    // Se for bundle, remove também todos os itens individuais
     let itensRemovidos = 1;
     if (cosmetico.isBundle && cosmetico.bundleItems && cosmetico.bundleItems.length > 0) {
-      console.log(`🔄 Reembolsando bundle: "${cosmetico.nome}" com ${cosmetico.bundleItems.length} itens`);
-      
       for (const item of cosmetico.bundleItems) {
         const itemId = item._id || item;
         const possuiaItem = usuario.cosmeticosComprados.some(
@@ -177,8 +162,6 @@ export const reembolsarCosmetico = async (req, res) => {
           itensRemovidos++;
         }
       }
-      
-      console.log(`✅ Bundle reembolsado: ${itensRemovidos} itens removidos (1 bundle + ${itensRemovidos - 1} itens individuais)`);
     }
 
     // Devolve o valor dos créditos
@@ -204,7 +187,7 @@ export const reembolsarCosmetico = async (req, res) => {
       cosmeticosComprados: usuarioAtualizado.cosmeticosComprados,
     });
   } catch (erro) {
-    console.error("❌ Erro ao reembolsar cosmético:", erro);
+    console.error("Erro ao reembolsar cosmético:", erro);
     res.status(500).json({ mensagem: "Erro ao processar reembolso." });
   }
 };

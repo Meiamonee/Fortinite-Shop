@@ -12,75 +12,59 @@ import cron from "node-cron";
 dotenv.config();
 const app = express();
 
-// 🔹 Middlewares
 app.use(express.json());
 app.use(cors());
 
-// 🔹 Conexão com o MongoDB
 connectDB();
 
-// 🔹 Rotas
 app.use("/auth", AuthRotas);
 app.use("/cosmeticos", CosmeticoRotas);
 app.use("/compras", CompraRotas);
 app.use("/usuarios", UsuarioRotas);
 
-// 🔹 Rota de teste
 app.get("/", (req, res) => res.send("Servidor backend Fortnite - OK"));
 
-// 🔹 Porta do servidor
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Servidor rodando em http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Servidor rodando em http://localhost:${PORT}`));
 
-/* =======================================================
-   🔄 SINCRONIZAÇÃO AUTOMÁTICA COM A API FORTNITE
-   ======================================================= */
-
-// Função auxiliar para executar a importação sem resposta HTTP
+// Sincronização automática com API Fortnite
 const executarImportacao = async () => {
   try {
-    console.log("🔁 [SYNC] Iniciando sincronização com API Fortnite...");
-    const req = {}; // mocks vazios
+    const req = {};
     const res = {
       status: () => ({
-        json: (data) => console.log("✅ [SYNC] Resultado:", data.mensagem || "Sincronização concluída."),
+        json: () => {},
       }),
     };
     await importarCosmeticos(req, res);
-    console.log("✅ [SYNC] Importação de cosméticos finalizada.\n");
   } catch (erro) {
-    console.error("❌ [SYNC] Erro ao sincronizar cosméticos:", erro.message);
+    console.error("Erro ao sincronizar cosméticos:", erro.message);
   }
 };
 
-// Função auxiliar para sincronizar status (novo/loja)
 const executarSincronizacaoStatus = async () => {
   try {
-    console.log("🔄 [STATUS] Iniciando sincronização de status...");
-    const req = {}; // mocks vazios
+    const req = {};
     const res = {
       status: () => ({
-        json: (data) => console.log("✅ [STATUS] Resultado:", data.mensagem || "Status sincronizados."),
+        json: () => {},
       }),
     };
     await sincronizarStatus(req, res);
-    console.log("✅ [STATUS] Sincronização de status finalizada.\n");
   } catch (erro) {
-    console.error("❌ [STATUS] Erro ao sincronizar status:", erro.message);
+    console.error("Erro ao sincronizar status:", erro.message);
   }
 };
 
-// Função principal que executa tudo
 const executarSincronizacaoCompleta = async () => {
   await executarImportacao();
   await executarSincronizacaoStatus();
 };
 
-// 🔹 Executa a primeira sincronização assim que o servidor inicia
+// Executa sincronização na inicialização
 executarSincronizacaoCompleta();
 
-// 🔹 Executa automaticamente a cada 6 horas
+// Executa sincronização a cada 6 horas
 cron.schedule("0 */6 * * *", () => {
-  console.log("🕒 [CRON] Executando sincronização automática completa...");
   executarSincronizacaoCompleta();
 });

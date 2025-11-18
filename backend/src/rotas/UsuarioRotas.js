@@ -7,13 +7,8 @@ import {
 
 const router = express.Router();
 
-// Listar todos os usuários
 router.get("/", listarUsuarios);
-
-// 🔹 Nova rota pública para listar usuários
 router.get("/publicos", listarUsuariosPublicos);
-
-// Listar cosméticos comprados por um usuário
 router.get("/:id/cosmeticos", listarCosmeticosDoUsuario);
 
 export default router;
