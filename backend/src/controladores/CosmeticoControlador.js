@@ -160,16 +160,22 @@ export const importarCosmeticos = async (req, res) => {
 // Sincroniza status (novo/loja) dos cosméticos
 export const sincronizarStatus = async (req, res) => {
   try {
+    console.log("Iniciando sincronização de status...");
+    
     // Reseta todos os status para normal antes de sincronizar
-    await Cosmetico.updateMany({}, { status: "normal" });
+    const resetResult = await Cosmetico.updateMany({}, { status: "normal" });
+    console.log(`Resetados ${resetResult.modifiedCount} cosméticos para status normal`);
 
     let novosCount = 0;
     let lojaCount = 0;
+    let bundlesCount = 0;
 
     // Busca cosméticos novos
     try {
+      console.log("Buscando cosméticos novos da API...");
       const respostaNovos = await axios.get("https://fortnite-api.com/v2/cosmetics/new", {
         headers: { "User-Agent": "Mozilla/5.0" },
+        timeout: 30000,
       });
 
       let itensNovos = respostaNovos.data?.data?.items || respostaNovos.data?.data || [];
@@ -178,29 +184,36 @@ export const sincronizarStatus = async (req, res) => {
         itensNovos = itensNovos.br || itensNovos.items || [];
       }
 
+      console.log(`Cosméticos novos recebidos da API: ${Array.isArray(itensNovos) ? itensNovos.length : 0}`);
+
       if (Array.isArray(itensNovos)) {
         for (const item of itensNovos) {
-          const nome = item.name || item.displayName;
+          const nome = item.name || item.displayName || item.devName;
           if (nome) {
             const resultado = await Cosmetico.updateOne(
-              { nome },
+              { nome: { $regex: new RegExp(`^${nome}$`, 'i') } },
               { status: "novo" }
             );
             if (resultado.modifiedCount > 0) novosCount++;
           }
         }
       }
+      console.log(`Marcados ${novosCount} cosméticos como novos`);
     } catch (erro) {
       console.error("Erro ao buscar cosméticos novos:", erro.message);
+      console.error("Stack:", erro.stack);
     }
 
     // Busca cosméticos da loja e bundles
     try {
+      console.log("Buscando cosméticos da loja da API...");
       const respostaLoja = await axios.get("https://fortnite-api.com/v2/shop", {
         headers: { "User-Agent": "Mozilla/5.0" },
+        timeout: 30000,
       });
 
       const entries = respostaLoja.data?.data?.entries || [];
+      console.log(`Entradas da loja recebidas: ${entries.length}`);
       let bundlesCount = 0;
 
       for (const entry of entries) {
@@ -304,15 +317,23 @@ export const sincronizarStatus = async (req, res) => {
       }
     } catch (erro) {
       console.error("Erro ao buscar shop:", erro.message);
+      console.error("Stack:", erro.stack);
     }
 
-    const mensagem = `Sincronização de status concluída! ${novosCount} novos, ${lojaCount} na loja.`;
+    console.log(`Sincronização concluída: ${novosCount} novos, ${lojaCount} na loja, ${bundlesCount} bundles`);
+    
+    const mensagem = `Sincronização de status concluída! ${novosCount} novos, ${lojaCount} na loja, ${bundlesCount} bundles.`;
 
-    res.status(200).json({
-      mensagem,
-      novos: novosCount,
-      loja: lojaCount,
-    });
+    if (res && res.status) {
+      res.status(200).json({
+        mensagem,
+        novos: novosCount,
+        loja: lojaCount,
+        bundles: bundlesCount,
+      });
+    } else {
+      console.log(mensagem);
+    }
   } catch (erro) {
     console.error("Erro ao sincronizar status:", erro.message);
     res.status(500).json({ mensagem: "Erro ao sincronizar status." });
