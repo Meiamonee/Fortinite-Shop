@@ -174,7 +174,7 @@ export default function Historico() {
                     <p>
                       <strong>Tipo:</strong>{" "}
                       <span className={tipoTransacao === "compra" ? "badge-compra" : "badge-reembolso"}>
-                        {tipoTransacao === "compra" ? "🛒 Compra" : "💰 Reembolso"}
+                        {tipoTransacao === "compra" ? " Compra" : " Reembolso"}
                       </span>
                     </p>
                     <p>
@@ -192,12 +192,12 @@ export default function Historico() {
                       onClick={() => handleReembolso(cosmeticoId)}
                       disabled={estaProcessando}
                     >
-                      {estaProcessando ? "⏳ Processando..." : "💸 Solicitar Reembolso"}
+                      {estaProcessando ? "Processando..." : "Solicitar Reembolso"}
                     </button>
                   )}
                   
                   {tipoTransacao === "compra" && reembolsado && (
-                    <div className="badge-reembolsado">✅ Já Reembolsado</div>
+                    <div className="badge-reembolsado">Já Reembolsado</div>
                   )}
                 </div>
               );

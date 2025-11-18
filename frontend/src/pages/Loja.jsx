@@ -165,7 +165,7 @@ export default function Loja() {
           <CosmeticoCard key={item._id} item={item} />
         ))}
         {cosmeticosPaginados.length === 0 && (
-          <p className="sem-resultados">Nenhum cosmético encontrado 😢</p>
+          <p className="sem-resultados">Nenhum cosmético encontrado</p>
         )}
       </div>
 

@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
-import AuthRotas from "./rotas/AuthRotas.js";
+import AuthRotas from "./rotas/authRotas.js";
 import CosmeticoRotas from "./rotas/CosmeticoRotas.js";
 import CompraRotas from "./rotas/CompraRotas.js";
 import UsuarioRotas from "./rotas/UsuarioRotas.js";

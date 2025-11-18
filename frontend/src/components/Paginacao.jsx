@@ -54,7 +54,7 @@ export default function Paginacao({
         onClick={() => irParaPagina(paginaAtual - 1)} 
         disabled={paginaAtual === 1}
       >
-        ← Anterior
+         Anterior
       </button>
 
       {paginasExibidas.map((pagina, i) =>
@@ -78,7 +78,7 @@ export default function Paginacao({
         onClick={() => irParaPagina(paginaAtual + 1)}
         disabled={paginaAtual === totalPaginas}
       >
-        Próxima →
+        Próxima 
       </button>
     </div>
   );

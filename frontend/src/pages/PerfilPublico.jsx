@@ -67,7 +67,7 @@ export default function PerfilPublico() {
       <div className="perfil-publico-container">
         <p className="erro-mensagem">Usuário não encontrado</p>
         <button onClick={() => navigate("/usuarios")} className="btn-voltar">
-          ← Voltar para Usuários
+          Voltar para Usuários
         </button>
       </div>
     );
@@ -76,18 +76,18 @@ export default function PerfilPublico() {
   return (
     <div className="perfil-publico-container">
       <button onClick={() => navigate("/usuarios")} className="btn-voltar-top">
-        ← Voltar
+        Voltar
       </button>
 
       <div className="perfil-header">
         <div className="perfil-avatar-grande">
           <span className="avatar-icon-grande">👤</span>
         </div>
-        
+
         <div className="perfil-info-principal">
           <h1 className="perfil-nome">{usuario.nome}</h1>
           <p className="perfil-email">{usuario.email}</p>
-          
+
           <div className="perfil-stats-grid">
             <div className="stat-card">
               <img src={vbucksIcon} alt="V-Bucks" className="stat-icon-perfil" />
@@ -96,7 +96,7 @@ export default function PerfilPublico() {
                 <span className="stat-titulo">V-Bucks</span>
               </div>
             </div>
-            
+
             <div className="stat-card">
               <span className="stat-icon-grande">🎁</span>
               <div className="stat-detalhes">
@@ -109,29 +109,29 @@ export default function PerfilPublico() {
       </div>
 
       <div className="colecao-secao">
-        <h2 className="secao-titulo">🏆 Coleção de Cosméticos</h2>
-        
+        <h2 className="secao-titulo">Coleção de Cosméticos</h2>
+
         {cosmeticos.length === 0 ? (
           <p className="colecao-vazia">Este usuário ainda não possui itens na coleção 📦</p>
         ) : (
           <>
             <div className="colecao-grid">
               {cosmeticosPaginados.map((item) => (
-                <CosmeticoCard 
-                  key={item._id || item.id} 
-                  item={item} 
+                <CosmeticoCard
+                  key={item._id || item.id}
+                  item={item}
                 />
               ))}
             </div>
 
             {totalPaginas > 1 && (
               <div className="paginacao-container">
-                <button 
-                  className="btn-paginacao" 
-                  onClick={() => irParaPagina(paginaAtual - 1)} 
+                <button
+                  className="btn-paginacao"
+                  onClick={() => irParaPagina(paginaAtual - 1)}
                   disabled={paginaAtual === 1}
                 >
-                  ← Anterior
+                  Anterior
                 </button>
 
                 {gerarPaginas().map((pagina) => (
@@ -143,13 +143,12 @@ export default function PerfilPublico() {
                     {pagina}
                   </button>
                 ))}
-
                 <button
                   className="btn-paginacao"
                   onClick={() => irParaPagina(paginaAtual + 1)}
                   disabled={paginaAtual === totalPaginas}
                 >
-                  Próxima →
+                  Próxima
                 </button>
               </div>
             )}
