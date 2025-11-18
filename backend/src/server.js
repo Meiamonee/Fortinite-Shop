@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import mongoose from "mongoose";
 import connectDB from "./config/db.js";
 import AuthRotas from "./rotas/authRotas.js";
 import CosmeticoRotas from "./rotas/CosmeticoRotas.js";
@@ -10,6 +11,12 @@ import { importarCosmeticos, sincronizarStatus } from "./controladores/Cosmetico
 import cron from "node-cron";
 
 dotenv.config();
+
+// Debug: verifica variáveis de ambiente
+console.log("NODE_ENV:", process.env.NODE_ENV);
+console.log("MONGO_URI definida:", !!process.env.MONGO_URI);
+console.log("FRONTEND_URL:", process.env.FRONTEND_URL || "não definida");
+
 const app = express();
 
 app.use(express.json());
@@ -24,7 +31,13 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-connectDB();
+// Conecta ao banco antes de iniciar o servidor
+connectDB().then(() => {
+  console.log("Banco conectado, iniciando servidor...");
+}).catch((error) => {
+  console.error("Falha ao conectar ao banco:", error);
+  process.exit(1);
+});
 
 app.use("/auth", AuthRotas);
 app.use("/cosmeticos", CosmeticoRotas);
@@ -34,7 +47,21 @@ app.use("/usuarios", UsuarioRotas);
 app.get("/", (req, res) => res.send("Servidor backend Fortnite - OK"));
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Servidor rodando em http://localhost:${PORT}`));
+
+// Aguarda conexão com MongoDB antes de iniciar sincronizações
+mongoose.connection.once('open', () => {
+  console.log("Conexão MongoDB estabelecida, iniciando sincronizações...");
+  
+  // Sincronização automática com API Fortnite
+  executarSincronizacaoCompleta();
+  
+  // Executa sincronização a cada 6 horas
+  cron.schedule("0 */6 * * *", () => {
+    executarSincronizacaoCompleta();
+  });
+});
+
+app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
 
 // Sincronização automática com API Fortnite
 const executarImportacao = async () => {
@@ -69,11 +96,3 @@ const executarSincronizacaoCompleta = async () => {
   await executarImportacao();
   await executarSincronizacaoStatus();
 };
-
-// Executa sincronização na inicialização
-executarSincronizacaoCompleta();
-
-// Executa sincronização a cada 6 horas
-cron.schedule("0 */6 * * *", () => {
-  executarSincronizacaoCompleta();
-});

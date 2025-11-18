@@ -2,7 +2,17 @@ import mongoose from "mongoose";
 
 const connectDB = async () => {
   try {
-    let uri = process.env.MONGO_URI || "mongodb://localhost:27017/fortniteshop";
+    let uri = process.env.MONGO_URI;
+    
+    // Debug: verifica se a variável está sendo lida
+    if (!uri) {
+      console.error("ERRO: MONGO_URI não está definida nas variáveis de ambiente!");
+      console.log("Variáveis de ambiente disponíveis:", Object.keys(process.env).filter(k => k.includes('MONGO')));
+      throw new Error("MONGO_URI não configurada");
+    }
+    
+    // Remove espaços e quebras de linha
+    uri = uri.trim();
     
     // Adiciona o nome do banco na connection string se não tiver
     if (uri.includes('mongodb+srv://') || uri.includes('mongodb://')) {
@@ -20,14 +30,20 @@ const connectDB = async () => {
       }
     }
     
+    console.log("Tentando conectar ao MongoDB...");
+    console.log("URI (oculta):", uri.replace(/:[^:@]+@/, ':****@'));
+    
     await mongoose.connect(uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 30000,
+      socketTimeoutMS: 45000,
     });
 
-    console.log("MongoDB conectado");
+    console.log("MongoDB conectado com sucesso!");
   } catch (error) {
     console.error("Erro conectando ao MongoDB:", error.message);
+    console.error("Stack:", error.stack);
     process.exit(1);
   }
 };

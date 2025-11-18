@@ -13,10 +13,13 @@ FRONTEND_URL=https://seu-frontend.vercel.app
 PORT=5000
 ```
 
-**Importante:**
-- A connection string já está configurada com o banco `fortniteshop`
+**IMPORTANTE - Leia com atenção:**
+- **Cole a connection string EXATAMENTE como está acima** (com a senha e tudo)
+- **NÃO adicione espaços ou quebras de linha** na variável MONGO_URI
+- **Verifique se não há espaços antes ou depois** do sinal de `=`
 - Substitua `https://seu-frontend.vercel.app` pela URL real do seu frontend no Vercel
 - O Render define a porta automaticamente, mas o PORT serve como fallback
+- **No MongoDB Atlas**: Vá em "Network Access" e adicione `0.0.0.0/0` para permitir qualquer IP
 
 ### 2. Build Command no Render
 
@@ -135,10 +138,39 @@ Isso permitirá que o backend aceite requisições do frontend.
 - Certifique-se de que não há barra `/` no final da URL
 
 ### Erro de conexão com MongoDB
-- Verifique se a connection string está correta no Render
-- Verifique se o IP do Render está liberado no MongoDB Atlas (Network Access)
-- A connection string deve ter `/fortniteshop` antes do `?`
-- No MongoDB Atlas, vá em "Network Access" e adicione `0.0.0.0/0` para permitir qualquer IP (ou adicione o IP específico do Render)
+
+**Erro: `connect ECONNREFUSED ::1:27017` ou `connect ECONNREFUSED 127.0.0.1:27017`**
+
+Isso significa que a variável `MONGO_URI` não está sendo lida. Siga estes passos:
+
+1. **No Render, vá em "Environment" e verifique:**
+   - A variável `MONGO_URI` está definida?
+   - Não há espaços antes ou depois do `=`
+   - A connection string está completa (começa com `mongodb+srv://`)
+   - Clique em "Save Changes" se fez alguma alteração
+
+2. **Verifique os logs do Render:**
+   - Procure por: `MONGO_URI definida: false`
+   - Se aparecer `false`, a variável não está configurada corretamente
+
+3. **Formato correto da variável no Render:**
+   ```
+   Key: MONGO_URI
+   Value: mongodb+srv://meiamonebr_db_user:FmqDbe7dKqLNxCbu@cluster0.b3n9ffw.mongodb.net/fortniteshop?retryWrites=true&w=majority&appName=Cluster0
+   ```
+   - **NÃO** use aspas
+   - **NÃO** adicione espaços
+   - Cole exatamente como está acima
+
+4. **No MongoDB Atlas:**
+   - Vá em "Network Access"
+   - Clique em "Add IP Address"
+   - Selecione "Allow Access from Anywhere" (0.0.0.0/0)
+   - Ou adicione o IP específico do Render (veja nos logs)
+
+5. **Depois de corrigir, faça:**
+   - "Manual Deploy" → "Clear build cache & deploy"
+   - Isso força uma nova build com as variáveis atualizadas
 
 ### Frontend não carrega dados
 - Verifique se `VITE_API_URL` está configurada corretamente no Vercel
