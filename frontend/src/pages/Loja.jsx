@@ -37,23 +37,12 @@ export default function Loja() {
         if (filtro.status) params.append('status', filtro.status);
         if (filtro.promocao === "true") params.append('promocao', 'true');
         
-        console.log("Carregando cosméticos com filtros:", Object.fromEntries(params));
-        
         const resposta = await api.get(`/cosmeticos?${params.toString()}`);
         
         if (resposta.data.cosmeticos) {
           setCosmeticos(resposta.data.cosmeticos);
           setTotalPaginas(resposta.data.totalPaginas || 1);
           setTotal(resposta.data.total || 0);
-          
-          console.log(`Cosméticos carregados: ${resposta.data.cosmeticos.length} de ${resposta.data.total} total`);
-          
-          const emPromocao = resposta.data.cosmeticos.filter(item => 
-            item.regularPrice && item.preco && item.regularPrice > item.preco
-          );
-          if (emPromocao.length > 0) {
-            console.log(`Itens em promoção nesta página: ${emPromocao.length}`);
-          }
         } else {
           setCosmeticos(resposta.data);
         }
