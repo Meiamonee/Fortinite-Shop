@@ -8,7 +8,7 @@ Aplicação web completa para exibição, busca e compra de cosméticos do Fortn
 - [Tecnologias Utilizadas](#-tecnologias-utilizadas)
 - [Pré-requisitos](#-pré-requisitos)
 - [Como Rodar o Projeto](#-como-rodar-o-projeto)
-  -[Usando Docker (Recomendado)](#usando-docker-recomendado)
+    -  [Usando Docker](#usando-docker)
 - [Estrutura do Projeto](#-estrutura-do-projeto)
 - [Decisões Técnicas](#-decisões-técnicas)
 - [API Externa](#-api-externa)
@@ -85,7 +85,7 @@ Aplicação web completa para exibição, busca e compra de cosméticos do Fortn
 
 ## 🚀 Como Rodar o Projeto
 
-### Usando Docker (Recomendado)
+### Usando Docker 
 
 1. **Clone o repositório:**
    ```bash
