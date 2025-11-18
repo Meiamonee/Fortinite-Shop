@@ -22,10 +22,14 @@ export default function CosmeticoDetalhe() {
           setUsuario(userData);
         }
 
-        const resposta = await api.get("/cosmeticos");
-        const item = resposta.data.find((c) => c._id === id);
-        
-        setCosmetico(item || null);
+        // Busca cosmético por ID
+        try {
+          const resposta = await api.get(`/cosmeticos/${id}`);
+          setCosmetico(resposta.data || null);
+        } catch (erroBusca) {
+          console.error("Erro ao buscar cosmético:", erroBusca);
+          setCosmetico(null);
+        }
       } catch (erro) {
         console.error("❌ Erro ao carregar cosmético:", erro);
       } finally {

@@ -1,10 +1,60 @@
 import axios from "axios";
 import Cosmetico from "../models/Cosmeticos.js";
+import mongoose from "mongoose";
+
+export const buscarCosmeticoPorId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ mensagem: "ID inválido." });
+    }
+    
+    const cosmetico = await Cosmetico.findById(id).populate('bundleItems');
+    
+    if (!cosmetico) {
+      return res.status(404).json({ mensagem: "Cosmético não encontrado." });
+    }
+    
+    res.status(200).json(cosmetico);
+  } catch (erro) {
+    console.error("Erro ao buscar cosmético:", erro.message);
+    res.status(500).json({ mensagem: "Erro ao buscar cosmético." });
+  }
+};
 
 export const listarCosmeticos = async (req, res) => {
   try {
-    const cosmeticos = await Cosmetico.find().sort({ createdAt: -1 });
-    res.status(200).json(cosmeticos);
+    const { page = 1, limit = 24, nome, tipo, raridade, status, promocao } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    
+    const filtro = {};
+    
+    if (nome) filtro.nome = { $regex: nome, $options: "i" };
+    if (tipo) filtro.tipo = tipo;
+    if (raridade) filtro.raridade = raridade;
+    if (status) filtro.status = status;
+    
+    if (promocao === "true") {
+      filtro.regularPrice = { $exists: true, $ne: null };
+      filtro.preco = { $exists: true, $ne: null };
+      filtro.$expr = { $gt: ["$regularPrice", "$preco"] };
+    }
+    
+    const total = await Cosmetico.countDocuments(filtro);
+    const cosmeticos = await Cosmetico.find(filtro)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit))
+      .select('nome tipo raridade preco regularPrice imagem status isBundle bundleItems createdAt');
+    
+    res.status(200).json({
+      cosmeticos,
+      total,
+      paginaAtual: parseInt(page),
+      totalPaginas: Math.ceil(total / parseInt(limit)),
+      itensPorPagina: parseInt(limit)
+    });
   } catch (erro) {
     console.error("Erro ao listar cosméticos:", erro.message);
     res.status(500).json({ mensagem: "Erro ao listar cosméticos." });

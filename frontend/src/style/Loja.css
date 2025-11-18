@@ -75,6 +75,44 @@
   font-size: 1.2rem;
 }
 
+/* Loading */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  min-height: 400px;
+}
+
+.spinner {
+  border: 4px solid var(--cor-fundo-secundario);
+  border-top: 4px solid var(--cor-acento);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-container p {
+  color: var(--cor-texto-principal);
+  font-size: 1.1rem;
+}
+
+/* Info de resultados */
+.info-resultados {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
 /* Responsividade */
 @media (max-width: 768px) {
   .grid-cosmeticos {

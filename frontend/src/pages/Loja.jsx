@@ -6,93 +6,86 @@ import "../style/Loja.css";
 
 export default function Loja() {
   const [cosmeticos, setCosmeticos] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [paginaAtual, setPaginaAtual] = useState(1);
+  const [totalPaginas, setTotalPaginas] = useState(1);
+  const [total, setTotal] = useState(0);
   const itensPorPagina = 24;
   const [filtro, setFiltro] = useState({
     nome: "",
     tipo: "",
     raridade: "",
-    status: "", // novo, loja, ou vazio (todos)
+    status: "",
+    promocao: "",
     dataInicio: "",
     dataFim: "",
   });
 
-  // 🔹 Carrega cosméticos (acessível sem login)
+  // Carrega cosméticos com paginação e filtros
   useEffect(() => {
     async function carregarCosmeticos() {
+      setLoading(true);
       try {
-        const resposta = await api.get("/cosmeticos");
-        setCosmeticos(resposta.data);
+        const params = new URLSearchParams({
+          page: paginaAtual.toString(),
+          limit: itensPorPagina.toString(),
+        });
         
-        // Debug: Verificar quantos itens em promoção vieram
-        const emPromocao = resposta.data.filter(item => 
-          item.regularPrice && item.preco && item.regularPrice > item.preco
-        );
-        console.log(`🔥 Itens em promoção carregados do backend: ${emPromocao.length}`);
-        if (emPromocao.length > 0) {
-          console.log("Exemplos:", emPromocao.slice(0, 3).map(i => ({
-            nome: i.nome,
-            regularPrice: i.regularPrice,
-            preco: i.preco
-          })));
+        if (filtro.nome) params.append('nome', filtro.nome);
+        if (filtro.tipo) params.append('tipo', filtro.tipo);
+        if (filtro.raridade) params.append('raridade', filtro.raridade);
+        if (filtro.status) params.append('status', filtro.status);
+        if (filtro.promocao === "true") params.append('promocao', 'true');
+        
+        const resposta = await api.get(`/cosmeticos?${params.toString()}`);
+        
+        if (resposta.data.cosmeticos) {
+          setCosmeticos(resposta.data.cosmeticos);
+          setTotalPaginas(resposta.data.totalPaginas || 1);
+          setTotal(resposta.data.total || 0);
+          
+          const emPromocao = resposta.data.cosmeticos.filter(item => 
+            item.regularPrice && item.preco && item.regularPrice > item.preco
+          );
+          if (emPromocao.length > 0) {
+            console.log(`Itens em promoção nesta página: ${emPromocao.length}`);
+          }
+        } else {
+          setCosmeticos(resposta.data);
         }
       } catch (erro) {
         console.error("Erro ao carregar cosméticos:", erro);
+      } finally {
+        setLoading(false);
       }
     }
     carregarCosmeticos();
-  }, []);
+  }, [paginaAtual, filtro.nome, filtro.tipo, filtro.raridade, filtro.status, filtro.promocao]);
 
-  // Filtragem local dos cosméticos
+  // Filtragem local apenas para data (backend não suporta ainda)
   const cosmeticosFiltrados = cosmeticos.filter((item) => {
-    const nomeMatch = item.nome.toLowerCase().includes(filtro.nome.toLowerCase());
-    const tipoMatch = filtro.tipo ? item.tipo === filtro.tipo : true;
-    const raridadeMatch = filtro.raridade ? item.raridade === filtro.raridade : true;
+    if (!filtro.dataInicio && !filtro.dataFim) return true;
     
-    // Status especial: bundle é identificado por isBundle, não por status
-    let statusMatch = true;
-    if (filtro.status === "bundle") {
-      statusMatch = item.isBundle === true;
-    } else if (filtro.status === "promocao") {
-      // Em promoção: regularPrice > preco
-      const emPromocao = item.regularPrice && item.preco && item.regularPrice > item.preco;
-      
-      // Debug - mostrar no console quando filtrar por promoção
-      if (filtro.status === "promocao" && emPromocao) {
-        console.log("🔥 Item em promoção encontrado:", item.nome, {
-          regularPrice: item.regularPrice,
-          preco: item.preco
-        });
-      }
-      
-      statusMatch = emPromocao;
-    } else if (filtro.status) {
-      statusMatch = item.status === filtro.status;
-    }
-
     const dataItem = new Date(item.createdAt);
     const inicioMatch = filtro.dataInicio ? dataItem >= new Date(filtro.dataInicio) : true;
     const fimMatch = filtro.dataFim ? dataItem <= new Date(filtro.dataFim) : true;
-
-    return nomeMatch && tipoMatch && raridadeMatch && statusMatch && inicioMatch && fimMatch;
+    
+    return inicioMatch && fimMatch;
   });
 
-  // Debug: mostrar quantos itens foram filtrados
-  if (filtro.status === "promocao") {
-    console.log(`📊 Total de itens em promoção após filtro: ${cosmeticosFiltrados.length}`);
-  }
+  // Filtro especial para bundles (client-side)
+  const cosmeticosFinais = filtro.status === "bundle" 
+    ? cosmeticosFiltrados.filter(item => item.isBundle === true)
+    : cosmeticosFiltrados;
 
-  // 🔹 Paginação
-  const totalPaginas = Math.ceil(cosmeticosFiltrados.length / itensPorPagina);
-  const indiceInicial = (paginaAtual - 1) * itensPorPagina;
-  const cosmeticosPaginados = cosmeticosFiltrados.slice(indiceInicial, indiceInicial + itensPorPagina);
-
-  // 🔹 Função para mudar de página
   const handleMudarPagina = (novaPagina) => {
     setPaginaAtual(novaPagina);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  useEffect(() => setPaginaAtual(1), [filtro]);
+  useEffect(() => {
+    setPaginaAtual(1);
+  }, [filtro.nome, filtro.tipo, filtro.raridade, filtro.status, filtro.promocao]);
 
   return (
     <div className="loja-container">
@@ -131,14 +124,21 @@ export default function Loja() {
 
         <select
           value={filtro.status}
-          onChange={(e) => setFiltro({ ...filtro, status: e.target.value })}
+          onChange={(e) => {
+            const novoStatus = e.target.value;
+            setFiltro({ 
+              ...filtro, 
+              status: novoStatus === "promocao" ? "" : novoStatus,
+              promocao: novoStatus === "promocao" ? "true" : ""
+            });
+          }}
           className="filtro-select"
         >
           <option value="">Status</option>
-          <option value="novo"> Novos</option>
-          <option value="loja"> À Venda</option>
-          <option value="promocao"> Em Promoção</option>
-          <option value="bundle"> Bundles</option>
+          <option value="novo">Novos</option>
+          <option value="loja">À Venda</option>
+          <option value="promocao">Em Promoção</option>
+          <option value="bundle">Bundles</option>
         </select>
 
         <div className="data-filtro">
@@ -159,22 +159,35 @@ export default function Loja() {
         </div>
       </div>
 
-      {/* 🔹 Listagem */}
-      <div className="grid-cosmeticos">
-        {cosmeticosPaginados.map((item) => (
-          <CosmeticoCard key={item._id} item={item} />
-        ))}
-        {cosmeticosPaginados.length === 0 && (
-          <p className="sem-resultados">Nenhum cosmético encontrado</p>
-        )}
-      </div>
+      {loading ? (
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>Carregando cosméticos...</p>
+        </div>
+      ) : (
+        <>
+          <div className="info-resultados">
+            <p>Total: {filtro.status === "bundle" ? cosmeticosFinais.length : total} cosméticos</p>
+          </div>
+          
+          <div className="grid-cosmeticos">
+            {cosmeticosFinais.map((item) => (
+              <CosmeticoCard key={item._id} item={item} />
+            ))}
+            {cosmeticosFinais.length === 0 && (
+              <p className="sem-resultados">Nenhum cosmético encontrado</p>
+            )}
+          </div>
 
-    
-      <Paginacao
-        paginaAtual={paginaAtual}
-        totalPaginas={totalPaginas}
-        onMudarPagina={handleMudarPagina}
-      />
+          {filtro.status !== "bundle" && (
+            <Paginacao
+              paginaAtual={paginaAtual}
+              totalPaginas={totalPaginas}
+              onMudarPagina={handleMudarPagina}
+            />
+          )}
+        </>
+      )}
     </div>
   );
 }
